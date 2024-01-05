@@ -5,7 +5,7 @@
 library(viridis)
 library(fields)
 
-setwd("~/Documents/Lab/achiasmy")
+setwd("~/Documents/GitHub/achiasmy")
 
 # Variables needed
 ## h - dominance factor of the male benefit allele
@@ -16,11 +16,10 @@ setwd("~/Documents/Lab/achiasmy")
 ## me - mutation effect
 ## u - mutation rate
 
-
-### Individual Run ####
+## Main Function
 simLife <- function(h = 1, s = 0, r1 = 0, r2 = 0,
                     gen = 1000, me = 0.001, u = 0.001,
-                    aneu=0, auto.option=0){
+                    aneu=0, option="Y"){
   #TODO
   # mutational load
   ml <- 0
@@ -30,54 +29,54 @@ simLife <- function(h = 1, s = 0, r1 = 0, r2 = 0,
   wm <- matrix(c(1-aneu, 1-ml, (1+h*s)*(1-aneu), (1+h*s)*(1-ml), (1+s)*(1-aneu), (1+s)*(1-ml)), 2, 3)
   
   # Initial gamete frequencies
-  
-  # ########### for x
-  # # eggs
-  # xfr.e <- 0.499925
-  # xfa.e <- 0.000075
-  # xmr.e <- 0.499925
-  # xma.e <- 0.000075
-  # # sperm
-  # xfr.s <- 0.249925
-  # xfa.s <- 0.000025
-  # xmr.s <- 0.249925
-  # xma.s <- 0.000025
-  # yfr.s <- 0.25
-  # yfa.s <- 0
-  # ymr.s <- 0.25
-  # yma.s <- 0
-  
-  ########### for y
-  # eggs
-  xfr.e <- 0.5
-  xfa.e <- 0
-  xmr.e <- 0.5
-  xma.e <- 0
-  # sperm
-  xfr.s <- 0.25
-  xfa.s <- 0
-  xmr.s <- 0.25
-  xma.s <- 0
-  yfr.s <- 0.24995
-  yfa.s <- 0.00005
-  ymr.s <- 0.24995
-  yma.s <- 0.00005
-  
-  # ############ for autosome
-  # # eggs
-  # xfr.e <- 0.49995
-  # xfa.e <- 0.00005
-  # xmr.e <- 0.49995
-  # xma.e <- 0.00005
-  # # sperm
-  # xfr.s <- 0.249975
-  # xfa.s <- 0.000025
-  # xmr.s <- 0.249975
-  # xma.s <- 0.000025
-  # yfr.s <- 0.249975
-  # yfa.s <- 0.000025
-  # ymr.s <- 0.249975
-  # yma.s <- 0.000025
+  if (option == "Y") {
+    # eggs
+    xfr.e <- 0.5
+    xfa.e <- 0
+    xmr.e <- 0.5
+    xma.e <- 0
+    # sperm
+    xfr.s <- 0.25
+    xfa.s <- 0
+    xmr.s <- 0.25
+    xma.s <- 0
+    yfr.s <- 0.24995
+    yfa.s <- 0.00005
+    ymr.s <- 0.24995
+    yma.s <- 0.00005
+  }
+  if (option == "X") {
+    # eggs
+    xfr.e <- 0.499925
+    xfa.e <- 0.000075
+    xmr.e <- 0.499925
+    xma.e <- 0.000075
+    # sperm
+    xfr.s <- 0.249925
+    xfa.s <- 0.000025
+    xmr.s <- 0.249925
+    xma.s <- 0.000025
+    yfr.s <- 0.25
+    yfa.s <- 0
+    ymr.s <- 0.25
+    yma.s <- 0
+  }
+  if (option == "A") {
+    # eggs
+    xfr.e <- 0.49995
+    xfa.e <- 0.00005
+    xmr.e <- 0.49995
+    xma.e <- 0.00005
+    # sperm
+    xfr.s <- 0.249975
+    xfa.s <- 0.000025
+    xmr.s <- 0.249975
+    xma.s <- 0.000025
+    yfr.s <- 0.249975
+    yfa.s <- 0.000025
+    ymr.s <- 0.249975
+    yma.s <- 0.000025
+  }
 
   results <- matrix(NA,gen,8)
   colnames(results) <- c("Xfr", "Xfa", "Xmr", "Xma","Yfr", "Yfa", "Ymr", "Yma")
@@ -93,28 +92,29 @@ simLife <- function(h = 1, s = 0, r1 = 0, r2 = 0,
     xmr.ep <- (0.5*xfr.e*xmr.s*wf[2] + 0.5*xfr.e*xma.s*wf[2]*r2 + 0.5*xfa.e*xmr.s*wf[2]*(1-r2) + 0.5*xmr.e*xfr.s*wf[2] + 0.5*xmr.e*xfa.s*wf[2]*(1-r2) + xmr.e*xmr.s*wf[3] + 0.5*xmr.e*xma.s*wf[3] + 0.5*xma.e*xfr.s*wf[2]*r2 + 0.5*xma.e*xmr.s*wf[3])/wbarf
     xma.ep <- (0.5*xfr.e*xma.s*wf[2]*(1-r2) + 0.5*xfa.e*xmr.s*wf[2]*r2 + 0.5*xfa.e*xma.s*wf[2] + 0.5*xmr.e*xfa.s*wf[2]*r2 + 0.5*xmr.e*xma.s*wf[3] + 0.5*xma.e*xfr.s*wf[2]*(1-r2) + 0.5*xma.e*xfa.s*wf[2] + 0.5*xma.e*xmr.s*wf[3] + xma.e*xma.s*wf[3])/wbarf
     
-    #male gamete equations - y chromosome
-    xfr.sp <- (0.5*xfr.e*yfr.s*wm[1,1] + 0.5*xfr.e*yfa.s*wm[2,1] + 0.5*xfr.e*ymr.s*wm[1,2]*(1-r1) + 0.5*xfr.e*yma.s*wm[2,2] + 0.5*xmr.e*yfr.s*wm[1,2]*r1)/wbarm
-    xfa.sp <- (0.5*xfa.e*yfr.s*wm[2,1] + 0.5*xfa.e*yfa.s*wm[2,1] + 0.5*xfa.e*ymr.s*wm[2,2] + 0.5*xfa.e*yma.s*wm[2,2])/wbarm
-    xmr.sp <- (0.5*xmr.e*yfa.s*wm[2,2] + 0.5*xmr.e*ymr.s*wm[1,3] + 0.5*xmr.e*yfr.s*wm[1,2]*(1-r1) + 0.5*xmr.e*yma.s*wm[2,3] + 0.5*xfr.e*ymr.s*wm[1,2]*r1)/wbarm
-    xma.sp <- (0.5*xma.e*yfr.s*wm[2,2] + 0.5*xma.e*yfa.s*wm[2,2] + 0.5*xma.e*ymr.s*wm[2,3] + 0.5*xma.e*yma.s*wm[2,3])/wbarm
+    if (option == "Y" | option == "X") {
+      xfr.sp <- (0.5*xfr.e*yfr.s*wm[1,1] + 0.5*xfr.e*yfa.s*wm[2,1] + 0.5*xfr.e*ymr.s*wm[1,2]*(1-r1) + 0.5*xfr.e*yma.s*wm[2,2] + 0.5*xmr.e*yfr.s*wm[1,2]*r1)/wbarm
+      xfa.sp <- (0.5*xfa.e*yfr.s*wm[2,1] + 0.5*xfa.e*yfa.s*wm[2,1] + 0.5*xfa.e*ymr.s*wm[2,2] + 0.5*xfa.e*yma.s*wm[2,2])/wbarm
+      xmr.sp <- (0.5*xmr.e*yfa.s*wm[2,2] + 0.5*xmr.e*ymr.s*wm[1,3] + 0.5*xmr.e*yfr.s*wm[1,2]*(1-r1) + 0.5*xmr.e*yma.s*wm[2,3] + 0.5*xfr.e*ymr.s*wm[1,2]*r1)/wbarm
+      xma.sp <- (0.5*xma.e*yfr.s*wm[2,2] + 0.5*xma.e*yfa.s*wm[2,2] + 0.5*xma.e*ymr.s*wm[2,3] + 0.5*xma.e*yma.s*wm[2,3])/wbarm
+      
+      yfr.sp <- (0.5*xfr.e*yfr.s*wm[1,1] + 0.5*xfr.e*ymr.s*wm[1,2]*r1 + 0.5*xfa.e*yfr.s*wm[2,1] + 0.5*xmr.e*yfr.s*wm[1,2]*(1-r1) + 0.5*xma.e*yfr.s*wm[2,2])/wbarm
+      yfa.sp <- (0.5*xfr.e*yfa.s*wm[2,1] + 0.5*xfa.e*yfa.s*wm[2,1] + 0.5*xmr.e*yfa.s*wm[2,2] + 0.5*xma.e*yfa.s*wm[2,2])/wbarm
+      ymr.sp <- (0.5*xfr.e*ymr.s*wm[1,2]*(1-r1) + 0.5*xfa.e*ymr.s*wm[2,2] + 0.5*xmr.e*yfr.s*wm[1,2]*r1 + 0.5*xmr.e*ymr.s*wm[1,3] + 0.5*xma.e*ymr.s*wm[2,3])/wbarm
+      yma.sp <- (0.5*xfr.e*yma.s*wm[2,2] + 0.5*xfa.e*yma.s*wm[2,2] + 0.5*xmr.e*yma.s*wm[2,3] + 0.5*xma.e*yma.s*wm[2,3])/wbarm
+    }
+    if (option == "A") {
+      xfr.sp <- (0.5*xfr.e*yfr.s*wm[1,1] + 0.25*xfr.e*yfa.s*wm[2,1] + 0.5*xfr.e*ymr.s*wm[1,2]*(1-r1) + 0.25*xfr.e*yma.s*wm[2,2] + 0.25*xfa.e*yfr.s*wm[2,1] + 0.25*xfa.e*ymr.s*wm[2,2] + 0.5*xmr.e*yfr.s*wm[1,2]*r1)/wbarm
+      xfa.sp <- (0.25*xfr.e*yfa.s*wm[2,1] + 0.25*xfr.e*yma.s*wm[2,2] + 0.25*xfa.e*yfr.s*wm[2,1] + 0.5*xfa.e*yfa.s*wm[2,1] + 0.25*xfa.e*ymr.s*wm[2,2] + 0.5*xfa.e*yma.s*wm[2,2])/wbarm
+      xmr.sp <- (0.5*xfr.e*ymr.s*wm[1,2]*r1 + 0.5*xmr.e*yfr.s*wm[1,2]*(1-r1) + 0.25*xmr.e*yfa.s*wm[2,2] + 0.5*xmr.e*ymr.s*wm[1,3] + 0.25*xmr.e*yma.s*wm[2,3] + 0.25*xma.e*yfr.s*wm[2,2] + 0.25*xma.e*ymr.s*wm[2,3])/wbarm
+      xma.sp <- (0.25*xmr.e*yfa.s*wm[2,2] + 0.25*xmr.e*yma.s*wm[2,3] + 0.25*xma.e*yfr.s*wm[2,2] + 0.25*xma.e*yfa.s*wm[2,2] + 0.25*xma.e*ymr.s*wm[2,3] + 0.5*xma.e*yma.s*wm[2,3])/wbarm
 
-    yfr.sp <- (0.5*xfr.e*yfr.s*wm[1,1] + 0.5*xfr.e*ymr.s*wm[1,2]*r1 + 0.5*xfa.e*yfr.s*wm[2,1] + 0.5*xmr.e*yfr.s*wm[1,2]*(1-r1) + 0.5*xma.e*yfr.s*wm[2,2])/wbarm
-    yfa.sp <- (0.5*xfr.e*yfa.s*wm[2,1] + 0.5*xfa.e*yfa.s*wm[2,1] + 0.5*xmr.e*yfa.s*wm[2,2] + 0.5*xma.e*yfa.s*wm[2,2])/wbarm
-    ymr.sp <- (0.5*xfr.e*ymr.s*wm[1,2]*(1-r1) + 0.5*xfa.e*ymr.s*wm[2,2] + 0.5*xmr.e*yfr.s*wm[1,2]*r1 + 0.5*xmr.e*ymr.s*wm[1,3] + 0.5*xma.e*ymr.s*wm[2,3])/wbarm
-    yma.sp <- (0.5*xfr.e*yma.s*wm[2,2] + 0.5*xfa.e*yma.s*wm[2,2] + 0.5*xmr.e*yma.s*wm[2,3] + 0.5*xma.e*yma.s*wm[2,3])/wbarm
-
-    # #male gamete equations - autosome
-    # xfr.sp <- (0.5*xfr.e*yfr.s*wm[1,1] + 0.25*xfr.e*yfa.s*wm[2,1] + 0.5*xfr.e*ymr.s*wm[1,2]*(1-r1) + 0.25*xfr.e*yma.s*wm[2,2] + 0.25*xfa.e*yfr.s*wm[2,1] + 0.25*xfa.e*ymr.s*wm[2,2] + 0.5*xmr.e*yfr.s*wm[1,2]*r1)/wbarm
-    # xfa.sp <- (0.25*xfr.e*yfa.s*wm[2,1] + 0.25*xfr.e*yma.s*wm[2,2] + 0.25*xfa.e*yfr.s*wm[2,1] + 0.5*xfa.e*yfa.s*wm[2,1] + 0.25*xfa.e*ymr.s*wm[2,2] + 0.5*xfa.e*yma.s*wm[2,2])/wbarm
-    # xmr.sp <- (0.5*xfr.e*ymr.s*wm[1,2]*r1 + 0.5*xmr.e*yfr.s*wm[1,2]*(1-r1) + 0.25*xmr.e*yfa.s*wm[2,2] + 0.5*xmr.e*ymr.s*wm[1,3] + 0.25*xmr.e*yma.s*wm[2,3] + 0.25*xma.e*yfr.s*wm[2,2] + 0.25*xma.e*ymr.s*wm[2,3])/wbarm
-    # xma.sp <- (0.25*xmr.e*yfa.s*wm[2,2] + 0.25*xmr.e*yma.s*wm[2,3] + 0.25*xma.e*yfr.s*wm[2,2] + 0.25*xma.e*yfa.s*wm[2,2] + 0.25*xma.e*ymr.s*wm[2,3] + 0.5*xma.e*yma.s*wm[2,3])/wbarm
-    # 
-    # yfr.sp <- (0.5*xfr.e*yfr.s*wm[1,1] + 0.25*xfr.e*yfa.s*wm[2,1] + 0.5*xfr.e*ymr.s*wm[1,2]*r1 + 0.25*xfa.e*yfr.s*wm[2,1] + 0.5*xmr.e*yfr.s*wm[1,2]*(1-r1) + 0.25*xmr.e*yfa.s*wm[2,2] + 0.25*xma.e*yfr.s*wm[2,2])/wbarm
-    # yfa.sp <- (0.25*xfr.e*yfa.s*wm[2,1] + 0.25*xfa.e*yfr.s*wm[2,1] + 0.5*xfa.e*yfa.s*wm[2,1] + 0.25*xmr.e*yfa.s*wm[2,2] + 0.25*xma.e*yfr.s*wm[2,2] + 0.25*xma.e*yfa.s*wm[2,2])/wbarm
-    # ymr.sp <- (0.5*xfr.e*ymr.s*wm[1,2]*(1-r1) + 0.25*xfr.e*yma.s*wm[2,2] + 0.25*xfa.e*ymr.s*wm[2,2] + 0.5*xmr.e*yfr.s*wm[1,2]*r1 + 0.5*xmr.e*ymr.s*wm[1,3] + 0.25*xmr.e*yma.s*wm[2,3] + 0.25*xma.e*ymr.s*wm[2,3])/wbarm
-    # yma.sp <- (0.25*xfr.e*yma.s*wm[2,2] + 0.25*xfa.e*ymr.s*wm[2,2] + 0.5*xfa.e*yma.s*wm[2,2] + 0.25*xmr.e*yma.s*wm[2,3] + 0.25*xma.e*ymr.s*wm[2,3] + 0.5*xma.e*yma.s*wm[2,3])/wbarm
-
+      yfr.sp <- (0.5*xfr.e*yfr.s*wm[1,1] + 0.25*xfr.e*yfa.s*wm[2,1] + 0.5*xfr.e*ymr.s*wm[1,2]*r1 + 0.25*xfa.e*yfr.s*wm[2,1] + 0.5*xmr.e*yfr.s*wm[1,2]*(1-r1) + 0.25*xmr.e*yfa.s*wm[2,2] + 0.25*xma.e*yfr.s*wm[2,2])/wbarm
+      yfa.sp <- (0.25*xfr.e*yfa.s*wm[2,1] + 0.25*xfa.e*yfr.s*wm[2,1] + 0.5*xfa.e*yfa.s*wm[2,1] + 0.25*xmr.e*yfa.s*wm[2,2] + 0.25*xma.e*yfr.s*wm[2,2] + 0.25*xma.e*yfa.s*wm[2,2])/wbarm
+      ymr.sp <- (0.5*xfr.e*ymr.s*wm[1,2]*(1-r1) + 0.25*xfr.e*yma.s*wm[2,2] + 0.25*xfa.e*ymr.s*wm[2,2] + 0.5*xmr.e*yfr.s*wm[1,2]*r1 + 0.5*xmr.e*ymr.s*wm[1,3] + 0.25*xmr.e*yma.s*wm[2,3] + 0.25*xma.e*ymr.s*wm[2,3])/wbarm
+      yma.sp <- (0.25*xfr.e*yma.s*wm[2,2] + 0.25*xfa.e*ymr.s*wm[2,2] + 0.5*xfa.e*yma.s*wm[2,2] + 0.25*xmr.e*yma.s*wm[2,3] + 0.25*xma.e*ymr.s*wm[2,3] + 0.5*xma.e*yma.s*wm[2,3])/wbarm
+    }
+    
     #fill in new values
     xfr.e <- xfr.ep
     xfa.e <- xfa.ep
@@ -138,7 +138,7 @@ simLife <- function(h = 1, s = 0, r1 = 0, r2 = 0,
     results[i,6] <- yfa.s/0.5
     results[i,7] <- ymr.s/0.5
     results[i,8] <- yma.s/0.5
-      
+    
     #increase mutational load
     ml <- ml + me*u
     
@@ -148,6 +148,7 @@ simLife <- function(h = 1, s = 0, r1 = 0, r2 = 0,
   return(results)
 }
 
+### Individual Run ####
 res <- simLife(h=1,r1=0.05,r2=0.1,s=0.15,me=0.05,gen=1000,aneu=0)
 
 #Plot X-carrying gametes
@@ -196,92 +197,115 @@ text(x=0, y=0.8,
 #####
 
 
-#### Comparing across different recombination frequencies
+### Comparing across different recombination frequencies ####
 steps <- 200
 r2s <- seq(from = 0, to = 0.5, length.out=steps)
 r1s <- seq(from = 0, to = 0.5, length.out=steps)
+gen <- 1000
 
-resXr <- resXa <- resYr <- resYa <- matrix(NA, steps, steps)
+resY <- resX <- resA <- matrix(NA, steps, steps)
 row.names(resXr) <- row.names(resXa) <- row.names(resYr) <- row.names(resYa) <- paste("R2.", round(r2s, 3), sep="")
 colnames(resXr) <- colnames(resXa)<- colnames(resYr) <- colnames(resYa) <- paste("R1.", round(r1s, 3), sep="")
 
-gen <- 1000
+# Y mutation
 for (i in 1:steps) { # cycles through r2s
   print(paste("working on R2", i))
   for (j in 1:steps) { # cycles through r1s
     res <- simLife(r2 = r2s[i], r1 = r1s[j], h=0,
                    s = 0.1, me = 0.001,
-                   gen = gen)
-    resXr[i, j] <- (res[gen,1]+res[gen,3])
-    resXa[i, j] <- (res[gen,2]+res[gen,4])
-    resYr[i, j] <- (res[gen,5]+res[gen,7])
-    resYa[i, j] <- (res[gen,6]+res[gen,8])
+                   gen = gen, option = "Y")
+    resY[i, j] <- (res[gen,6]+res[gen,8])
   }
 }
+# X mutation
+for (i in 1:steps) { # cycles through r2s
+  print(paste("working on R2", i))
+  for (j in 1:steps) { # cycles through r1s
+    res <- simLife(r2 = r2s[i], r1 = r1s[j], h=0,
+                   s = 0.1, me = 0.001,
+                   gen = gen, option = "X")
+    resX[i, j] <- (res[gen,2]+res[gen,4])
+  }
+}
+# Autosome Mutation
+### TODO
 
-par(mfrow=c(1,2))
-
-image(resXr, col = viridis(100), yaxt='n', xaxt='n', ylab = "R1 (SDR - SAL)",
-      xlab = "R2 (SAL - Achiasmy)", zlim = c(0,1), main = "Xr Frequency (s=0.1,me=0.001)")
-axis(2, at = seq(from = 0, to = 1, length.out=6),
-     labels = seq(from = 0, to = 0.5, length.out=6))
-axis(1, at = seq(from = 0, to = 1, length.out=6),
-     labels = seq(from = 0, to = 0.5, length.out=6))
-
-image(resXa, col = viridis(100), yaxt='n', xaxt='n', ylab = "R1 (SDR - SAL)",
-      xlab = "R2 (SAL - Achiasmy)", zlim = c(0,1), main = "Xa Frequency")
-axis(2, at = seq(from = 0, to = 1, length.out=6),
-     labels = seq(from = 0, to = 0.5, length.out=6))
-axis(1, at = seq(from = 0, to = 1, length.out=6),
-     labels = seq(from = 0, to = 0.5, length.out=6))
-
-image(resYr, col = viridis(100), yaxt='n', xaxt='n', ylab = "R1 (SDR - SAL)",
-      xlab = "R2 (SAL - Achiasmy)", zlim = c(0,1), main = "Yr Frequency")
-axis(2, at = seq(from = 0, to = 1, length.out=6),
-     labels = seq(from = 0, to = 0.5, length.out=6))
-axis(1, at = seq(from = 0, to = 1, length.out=6),
-     labels = seq(from = 0, to = 0.5, length.out=6))
-
-image(resYa, col = viridis(100), yaxt='n', xaxt='n', ylab = "R1 (SDR - SAL)",
+#Plotting
+par(mfrow=c(1,3))
+### TODO Fix labels
+image(resY, col = viridis(100), yaxt='n', xaxt='n', ylab = "R1 (SDR - SAL)",
       xlab = "R2 (SAL - Achiasmy)", zlim = c(0,1), main = "Ya Frequency")
 axis(2, at = seq(from = 0, to = 1, length.out=6),
      labels = seq(from = 0, to = 0.5, length.out=6))
 axis(1, at = seq(from = 0, to = 1, length.out=6),
      labels = seq(from = 0, to = 0.5, length.out=6))
+### TODO Fix labels
+image(resX, col = viridis(100), yaxt='n', xaxt='n', ylab = "R1 (SDR - SAL)",
+      xlab = "R2 (SAL - Achiasmy)", zlim = c(0,1), main = "Xa Frequency")
+axis(2, at = seq(from = 0, to = 1, length.out=6),
+     labels = seq(from = 0, to = 0.5, length.out=6))
+axis(1, at = seq(from = 0, to = 1, length.out=6),
+     labels = seq(from = 0, to = 0.5, length.out=6))
+### TODO Plot Autosome
 
+#####
 
-#### Comparing ME and S values
+### Comparing ME and S values ####
 steps <- 200
 mes <- seq(from = 0, to = 0.2, length.out=steps)
 svals <- seq(from = 0, to = 0.5, length.out=steps)
-
-resXr <- resXa <- resYr <- resYa <- matrix(NA, steps, steps)
-row.names(resXr) <- row.names(resXa) <- row.names(resYr) <- row.names(resYa) <- paste("me.", round(mes, 3), sep="")
-colnames(resXr) <- colnames(resXa)<- colnames(resYr) <- colnames(resYa) <- paste("sval.", round(svals, 3), sep="")
-
 gen <- 1000
+
+resY <- resX <- resA <- matrix(NA, steps, steps)
+row.names(resY) <- row.names(resX) <- row.names(resA) <- paste("me.", round(mes, 3), sep="")
+colnames(resY) <- colnames(resX)<- colnames(resA) <- paste("sval.", round(svals, 3), sep="")
+
+# Y mutation
 for (i in 1:steps) { # cycles through the mutational effects factors
   print(paste("working on me", i))
   for (j in 1:steps) { # cycles through the selection coef.
     res <- simLife(r2 = 0.1, r1 = 0.1, h=1,
                    s = svals[j], me = mes[i],
-                   gen = gen)
-    resXr[i, j] <- (res[gen,1]+res[gen,3])
-    resXa[i, j] <- (res[gen,2]+res[gen,4])
-    resYr[i, j] <- (res[gen,5]+res[gen,7])
-    resYa[i, j] <- (res[gen,6]+res[gen,8])
+                   gen = gen, option = "Y")
+    resY[i, j] <- (res[gen,6]+res[gen,8])
   }
 }
+# X mutation
+for (i in 1:steps) { # cycles through the mutational effects factors
+  print(paste("working on me", i))
+  for (j in 1:steps) { # cycles through the selection coef.
+    res <- simLife(r2 = 0.1, r1 = 0.1, h=1,
+                   s = svals[j], me = mes[i],
+                   gen = gen, option = "X")
+    resX[i, j] <- (res[gen,2]+res[gen,4])
+  }
+}
+# Autosome Mutation
+for (i in 1:steps) { # cycles through the mutational effects factors
+  print(paste("working on me", i))
+  for (j in 1:steps) { # cycles through the selection coef.
+    res <- simLife(r2 = 0.1, r1 = 0.1, h=1,
+                   s = svals[j], me = mes[i],
+                   gen = gen, option = "A")
+    resA[i, j] <- (((res[gen,2]+res[gen,4])*1.5)+((res[gen,6]+res[gen,8])*0.5))/2
+  }
+}
+write.csv(resY, file = "data/resY-me-s.csv", row.names = F)
+write.csv(resX, file = "data/resX-me-s.csv", row.names = F)
+write.csv(resA, file = "data/resA-me-s.csv", row.names = F)
 
+
+# Plotting
+resY <- read.csv("data/resY-me-s.csv")
+resX <- read.csv("data/resX-me-s.csv")
+resA <- read.csv("data/resA-me-s.csv")
 
 layout.matrix <- matrix(c(1, 2, 3, 4), nrow = 1, ncol = 4)
-
 layout(mat = layout.matrix,
        heights = c(5, 5, 5, 5), 
        widths = c(5, 5, 5, 1))
 par(mar = c(5.1,4.6,4.1,2.1))
-
-image(Ya, col = viridis(100, begin = 0.25, end = 1), yaxt='n', xaxt='n', zlim = c(0,1),
+image(resY, col = viridis(100, begin = 0.25, end = 1), yaxt='n', xaxt='n', zlim = c(0,1),
       ylab = "Selection Coefficient",
       xlab = "Deleterious Mutation Effect",
       main = "Frequency on Y",
@@ -293,8 +317,7 @@ axis(2, at = seq(from = 0, to = 1, length.out=6),
 axis(1, at = seq(from = 0, to = 1, length.out=6),
      labels = seq(from = 0, to = 0.2, length.out=6),
      cex.axis = 1.3)
-
-image(Xa, col = viridis(100, begin = 0.25), yaxt='n', xaxt='n', zlim = c(0,1),
+image(resX, col = viridis(100, begin = 0.25), yaxt='n', xaxt='n', zlim = c(0,1),
       ylab = "Selection Coefficient",
       xlab = "Deleterious Mutation Effect",
       main = "Frequency on X",
@@ -306,18 +329,12 @@ axis(2, at = seq(from = 0, to = 1, length.out=6),
 axis(1, at = seq(from = 0, to = 1, length.out=6),
      labels = seq(from = 0, to = 0.2, length.out=6),
      cex.axis = 1.3)
-
-#auto <- ((resXa*1.5)+(resYa*0.5))/2
-image(auto, col = viridis(100, begin = 0.25), yaxt='n', xaxt='n', zlim = c(0,1),
+image(resA, col = viridis(100, begin = 0.25), yaxt='n', xaxt='n', zlim = c(0,1),
       ylab = "Selection Coefficient",
       xlab = "Deleterious Mutation Effect",
       main = "Frequency on Autosome",
       cex.lab = 1.6,
       cex.main = 1.8)
-# image(((resXa*1.5)+(resYa*0.5))/2, col = viridis(100), yaxt='n', xaxt='n', zlim = c(0,1),
-#       ylab = "Selection Coefficient - S",
-#       xlab = "Mutation Effect (Deleterious)",
-#       main = "Frequency on Autosome")
 axis(2, at = seq(from = 0, to = 1, length.out=6),
      labels = seq(from = 0, to = 0.5, length.out=6),
      cex.axis = 1.3)
@@ -325,22 +342,12 @@ axis(1, at = seq(from = 0, to = 1, length.out=6),
      labels = seq(from = 0, to = 0.2, length.out=6),
      cex.axis = 1.3)
 
-image.plot(Ya, col = viridis(100, begin = 0.2), legend.only = T,
+image.plot(resY, col = viridis(100, begin = 0.2), legend.only = T,
            horizontal = F, legend.width = 5, legend.mar = 0,
            legend.shrink = 0.8)
+#####
 
-
-
-
-
-
-
-
-
-
-
-
-#### ME vs Aneu
+### ME vs Aneu ####
 steps <- 200
 mes <- seq(from = 0, to = 0.5, length.out=steps)
 kvals <- seq(from = 0, to = 0.5, length.out=steps)
@@ -409,5 +416,5 @@ axis(2, at = seq(from = 0, to = 1, length.out=6),
      labels = seq(from = 0, to = 0.5, length.out=6))
 axis(1, at = seq(from = 0, to = 1, length.out=6),
      labels = seq(from = 0, to = 0.5, length.out=6))
-
+#####
 
