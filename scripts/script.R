@@ -196,60 +196,6 @@ text(x=0, y=0.8,
      paste("Achiasmatic - Female Benefit"), pos=4, cex=.7)
 #####
 
-
-### Comparing across different recombination frequencies ####
-steps <- 200
-r2s <- seq(from = 0, to = 0.5, length.out=steps)
-r1s <- seq(from = 0, to = 0.5, length.out=steps)
-gen <- 1000
-
-resY <- resX <- resA <- matrix(NA, steps, steps)
-row.names(resXr) <- row.names(resXa) <- row.names(resYr) <- row.names(resYa) <- paste("R2.", round(r2s, 3), sep="")
-colnames(resXr) <- colnames(resXa)<- colnames(resYr) <- colnames(resYa) <- paste("R1.", round(r1s, 3), sep="")
-
-# Y mutation
-for (i in 1:steps) { # cycles through r2s
-  print(paste("working on R2", i))
-  for (j in 1:steps) { # cycles through r1s
-    res <- simLife(r2 = r2s[i], r1 = r1s[j], h=0,
-                   s = 0.1, me = 0.001,
-                   gen = gen, option = "Y")
-    resY[i, j] <- (res[gen,6]+res[gen,8])
-  }
-}
-# X mutation
-for (i in 1:steps) { # cycles through r2s
-  print(paste("working on R2", i))
-  for (j in 1:steps) { # cycles through r1s
-    res <- simLife(r2 = r2s[i], r1 = r1s[j], h=0,
-                   s = 0.1, me = 0.001,
-                   gen = gen, option = "X")
-    resX[i, j] <- (res[gen,2]+res[gen,4])
-  }
-}
-# Autosome Mutation
-### TODO
-
-#Plotting
-par(mfrow=c(1,3))
-### TODO Fix labels
-image(resY, col = viridis(100), yaxt='n', xaxt='n', ylab = "R1 (SDR - SAL)",
-      xlab = "R2 (SAL - Achiasmy)", zlim = c(0,1), main = "Ya Frequency")
-axis(2, at = seq(from = 0, to = 1, length.out=6),
-     labels = seq(from = 0, to = 0.5, length.out=6))
-axis(1, at = seq(from = 0, to = 1, length.out=6),
-     labels = seq(from = 0, to = 0.5, length.out=6))
-### TODO Fix labels
-image(resX, col = viridis(100), yaxt='n', xaxt='n', ylab = "R1 (SDR - SAL)",
-      xlab = "R2 (SAL - Achiasmy)", zlim = c(0,1), main = "Xa Frequency")
-axis(2, at = seq(from = 0, to = 1, length.out=6),
-     labels = seq(from = 0, to = 0.5, length.out=6))
-axis(1, at = seq(from = 0, to = 1, length.out=6),
-     labels = seq(from = 0, to = 0.5, length.out=6))
-### TODO Plot Autosome
-
-#####
-
 ### Comparing ME and S values ####
 steps <- 200
 mes <- seq(from = 0, to = 0.2, length.out=steps)
@@ -296,9 +242,9 @@ write.csv(resA, file = "data/resA-me-s.csv", row.names = F)
 
 
 # Plotting
-resY <- read.csv("data/resY-me-s.csv")
-resX <- read.csv("data/resX-me-s.csv")
-resA <- read.csv("data/resA-me-s.csv")
+resY <- as.matrix(read.csv("data/resY-me-s.csv"))
+resX <- as.matrix(read.csv("data/resX-me-s.csv"))
+resA <- as.matrix(read.csv("data/resA-me-s.csv"))
 
 layout.matrix <- matrix(c(1, 2, 3, 4), nrow = 1, ncol = 4)
 layout(mat = layout.matrix,
@@ -351,70 +297,148 @@ image.plot(resY, col = viridis(100, begin = 0.2), legend.only = T,
 steps <- 200
 mes <- seq(from = 0, to = 0.5, length.out=steps)
 kvals <- seq(from = 0, to = 0.5, length.out=steps)
-
-resXr <- resXa <- resYr <- resYa <- matrix(NA, steps, steps)
-row.names(resXr) <- row.names(resXa) <- row.names(resYr) <- row.names(resYa) <- paste("me.", round(mes, 3), sep="")
-colnames(resXr) <- colnames(resXa)<- colnames(resYr) <- colnames(resYa) <- paste("kval.", round(kvals, 3), sep="")
-
 gen <- 1000
+
+resY <- resX <- resA <- matrix(NA, steps, steps)
+row.names(resY) <- row.names(resX) <- row.names(resA) <- paste("me.", round(mes, 3), sep="")
+colnames(resY) <- colnames(resX)<- colnames(resA) <- paste("kval.", round(kvals, 3), sep="")
+
+# Y mutation
 for (i in 1:steps) { # cycles through the mutational effects factors
   print(paste("working on me", i))
-  for (j in 1:steps) { # cycles through the selection coef.
+  for (j in 1:steps) { # cycles through aneuploidy rates (k)
     res <- simLife(r2 = 0.1, r1 = 0.1, h=1, s=0,
                    aneu = kvals[j], me = mes[i],
-                   gen = gen)
-    resXr[i, j] <- (res[gen,1]+res[gen,3])
-    resXa[i, j] <- (res[gen,2]+res[gen,4])
-    resYr[i, j] <- (res[gen,5]+res[gen,7])
-    resYa[i, j] <- (res[gen,6]+res[gen,8])
+                   gen = gen, option = "Y")
+    resY[i, j] <- (res[gen,6]+res[gen,8])
   }
 }
+# X mutation
+for (i in 1:steps) { # cycles through the mutational effects factors
+  print(paste("working on me", i))
+  for (j in 1:steps) { # cycles through aneuploidy rates (k)
+    res <- simLife(r2 = 0.1, r1 = 0.1, h=1, s=0,
+                   aneu = kvals[j], me = mes[i],
+                   gen = gen, option = "X")
+    resX[i, j] <- (res[gen,2]+res[gen,4])
+  }
+}
+# A mutation
+for (i in 1:steps) { # cycles through the mutational effects factors
+  print(paste("working on me", i))
+  for (j in 1:steps) { # cycles through aneuploidy rates (k)
+    res <- simLife(r2 = 0.1, r1 = 0.1, h=1, s=0,
+                   aneu = kvals[j], me = mes[i],
+                   gen = gen, option = "A")
+    resA[i, j] <- (((res[gen,2]+res[gen,4])*1.5)+((res[gen,6]+res[gen,8])*0.5))/2
+  }
+}
+write.csv(resY, file = "data/resY-me-k.csv", row.names = F)
+write.csv(resX, file = "data/resX-me-k.csv", row.names = F)
+write.csv(resA, file = "data/resA-me-k.csv", row.names = F)
 
-par(mfrow=c(1,2))
+# Plotting
+resY <- as.matrix(read.csv("data/resY-me-k.csv"))
+resX <- as.matrix(read.csv("data/resX-me-k.csv"))
+resA <- as.matrix(read.csv("data/resA-me-k.csv"))
 
-image(resXr, col = viridis(100), yaxt='n', xaxt='n', zlim = c(0,1),
-      ylab = "Selection Coefficient - S",
-      xlab = "Mutation Effect (Deleterious)",
-      main = "Xr Frequency")
-axis(2, at = seq(from = 0, to = 1, length.out=6),
-     labels = seq(from = 0, to = 0.5, length.out=6))
-axis(1, at = seq(from = 0, to = 1, length.out=6),
-     labels = seq(from = 0, to = 0.5, length.out=6))
-
-image(resXa, col = viridis(100), yaxt='n', xaxt='n', zlim = c(0,1),
+layout.matrix <- matrix(c(1, 2, 3, 4), nrow = 1, ncol = 4)
+layout(mat = layout.matrix,
+       heights = c(5, 5, 5, 5),
+       widths = c(5, 5, 5, 1))
+par(mar = c(5.1,4.6,4.1,2.1))
+image(resY, col = viridis(100, begin = 0.25, end = 1), yaxt='n', xaxt='n', zlim = c(0,1),
       ylab = "Aneuploidy Rate",
-      xlab = "Mutation Effect (Deleterious)",
-      main = "Frequency on X")
+      xlab = "Deleterious Mutation Effect",
+      main = "Frequency on Y",
+      cex.lab = 1.6,
+      cex.main = 1.8)
 axis(2, at = seq(from = 0, to = 1, length.out=6),
-     labels = seq(from = 0, to = 0.5, length.out=6))
+     labels = seq(from = 0, to = 0.5, length.out=6),
+     cex.axis = 1.3)
 axis(1, at = seq(from = 0, to = 1, length.out=6),
-     labels = seq(from = 0, to = 0.5, length.out=6))
-
-image(resYr, col = viridis(100), yaxt='n', xaxt='n', zlim = c(0,1),
-      ylab = "Selection Coefficient - S",
-      xlab = "Mutation Effect (Deleterious)",
-      main = "Yr Frequency")
-axis(2, at = seq(from = 0, to = 1, length.out=6),
-     labels = seq(from = 0, to = 0.5, length.out=6))
-axis(1, at = seq(from = 0, to = 1, length.out=6),
-     labels = seq(from = 0, to = 0.5, length.out=6))
-
-image(resYa, col = viridis(100), yaxt='n', xaxt='n', zlim = c(0,1),
+     labels = seq(from = 0, to = 0.5, length.out=6),
+     cex.axis = 1.3)
+image(resX, col = viridis(100, begin = 0.25), yaxt='n', xaxt='n', zlim = c(0,1),
       ylab = "Aneuploidy Rate",
-      xlab = "Mutation Effect (Deleterious)",
-      main = "Frequency on Y")
+      xlab = "Deleterious Mutation Effect",
+      main = "Frequency on X",
+      cex.lab = 1.6,
+      cex.main = 1.8)
 axis(2, at = seq(from = 0, to = 1, length.out=6),
-     labels = seq(from = 0, to = 0.5, length.out=6))
+     labels = seq(from = 0, to = 0.5, length.out=6),
+     cex.axis = 1.3)
 axis(1, at = seq(from = 0, to = 1, length.out=6),
-     labels = seq(from = 0, to = 0.5, length.out=6))
-
-image(((resXa*1.5)+(resYa*0.5))/2, col = viridis(100), yaxt='n', xaxt='n', zlim = c(0,1),
+     labels = seq(from = 0, to = 0.5, length.out=6),
+     cex.axis = 1.3)
+image(resA, col = viridis(100, begin = 0.25), yaxt='n', xaxt='n', zlim = c(0,1),
       ylab = "Aneuploidy Rate",
-      xlab = "Mutation Effect (Deleterious)",
-      main = "Frequency on Autosome")
+      xlab = "Deleterious Mutation Effect",
+      main = "Frequency on Autosome",
+      cex.lab = 1.6,
+      cex.main = 1.8)
+axis(2, at = seq(from = 0, to = 1, length.out=6),
+     labels = seq(from = 0, to = 0.5, length.out=6),
+     cex.axis = 1.3)
+axis(1, at = seq(from = 0, to = 1, length.out=6),
+     labels = seq(from = 0, to = 0.5, length.out=6),
+     cex.axis = 1.3)
+
+image.plot(resY, col = viridis(100, begin = 0.2), legend.only = T,
+           horizontal = F, legend.width = 5, legend.mar = 0,
+           legend.shrink = 0.8)
+#####
+
+### Comparing across different recombination frequencies ####
+steps <- 200
+r2s <- seq(from = 0, to = 0.5, length.out=steps)
+r1s <- seq(from = 0, to = 0.5, length.out=steps)
+gen <- 1000
+
+resY <- resX <- resA <- matrix(NA, steps, steps)
+row.names(resXr) <- row.names(resXa) <- row.names(resYr) <- row.names(resYa) <- paste("R2.", round(r2s, 3), sep="")
+colnames(resXr) <- colnames(resXa)<- colnames(resYr) <- colnames(resYa) <- paste("R1.", round(r1s, 3), sep="")
+
+# Y mutation
+for (i in 1:steps) { # cycles through r2s
+  print(paste("working on R2", i))
+  for (j in 1:steps) { # cycles through r1s
+    res <- simLife(r2 = r2s[i], r1 = r1s[j], h=0,
+                   s = 0.1, me = 0.001,
+                   gen = gen, option = "Y")
+    resY[i, j] <- (res[gen,6]+res[gen,8])
+  }
+}
+# X mutation
+for (i in 1:steps) { # cycles through r2s
+  print(paste("working on R2", i))
+  for (j in 1:steps) { # cycles through r1s
+    res <- simLife(r2 = r2s[i], r1 = r1s[j], h=0,
+                   s = 0.1, me = 0.001,
+                   gen = gen, option = "X")
+    resX[i, j] <- (res[gen,2]+res[gen,4])
+  }
+}
+# Autosome Mutation
+### TODO
+
+#Plotting
+par(mfrow=c(1,3))
+### TODO Fix labels
+image(resY, col = viridis(100), yaxt='n', xaxt='n', ylab = "R1 (SDR - SAL)",
+      xlab = "R2 (SAL - Achiasmy)", zlim = c(0,1), main = "Ya Frequency")
 axis(2, at = seq(from = 0, to = 1, length.out=6),
      labels = seq(from = 0, to = 0.5, length.out=6))
 axis(1, at = seq(from = 0, to = 1, length.out=6),
      labels = seq(from = 0, to = 0.5, length.out=6))
+### TODO Fix labels
+image(resX, col = viridis(100), yaxt='n', xaxt='n', ylab = "R1 (SDR - SAL)",
+      xlab = "R2 (SAL - Achiasmy)", zlim = c(0,1), main = "Xa Frequency")
+axis(2, at = seq(from = 0, to = 1, length.out=6),
+     labels = seq(from = 0, to = 0.5, length.out=6))
+axis(1, at = seq(from = 0, to = 1, length.out=6),
+     labels = seq(from = 0, to = 0.5, length.out=6))
+### TODO Plot Autosome
+
 #####
 
