@@ -148,30 +148,32 @@ simLife <- function(h = 1, s = 0, r1 = 0, r2 = 0,
   return(results)
 }
 
-### Individual Run ####
-res <- simLife(h=1,r1=0.05,r2=0.1,s=0.15,me=0.05,gen=1000,aneu=0)
+### Individual Runs ####
+# Y chromosome
+res <- simLife(h=1,r1=0.1,r2=0.1,s=0.15,me=0.1,gen=1000,aneu=0,option = "Y")
 
 #Plot X-carrying gametes
+par(mfrow=c(1,2))
 plot(res[,1], type = "l", col = viridis(1, begin = 0.25), main = "Gamete Frequency",
      ylim = c(0, 1), xlim = c(0, length(res[,1])),
      xlab = "Generation", ylab = "Frequency", lwd = 3, lty = 2)
 lines(res[,2], col = viridis(1, begin = 0.25), lwd = 3)
 lines(res[,3], col = viridis(1, begin = 0.75), lwd = 3, lty = 2)
 lines(res[,4], col = viridis(1, begin = 0.75), lwd = 3)
-#abline(h=0, col = "black")
+abline(h=0, col = "black")
 abline(h=1, col = "black")
-points(x=0, y=0.95, pch = 16, col = "red")
-points(x=0, y=0.9, pch = 16, col = "blue")
-points(x=0, y=0.85, pch = 16, col = "green")
-points(x=0, y=0.8, pch = 16, col = "orange")
-text(x=0, y=0.95,
-     paste("Female Benefit"), pos=4, cex=.7)
-text(x=0, y=0.9,
-     paste("Male Benefit"), pos=4, cex=.7)
-text(x=0, y=0.85,
-     paste("Achiasmy - Female Benefit"), pos=4, cex=.7)
-text(x=0, y=0.8,
-     paste("Achiasmy - Male Benefit"), pos=4, cex=.7)
+# points(x=0, y=0.95, pch = 16, col = "red")
+# points(x=0, y=0.9, pch = 16, col = "blue")
+# points(x=0, y=0.85, pch = 16, col = "green")
+# points(x=0, y=0.8, pch = 16, col = "orange")
+# text(x=0, y=0.95,
+#      paste("Female Benefit"), pos=4, cex=.7)
+# text(x=0, y=0.9,
+#      paste("Male Benefit"), pos=4, cex=.7)
+# text(x=0, y=0.85,
+#      paste("Achiasmy - Female Benefit"), pos=4, cex=.7)
+# text(x=0, y=0.8,
+#      paste("Achiasmy - Male Benefit"), pos=4, cex=.7)
 
 #Plot Y-carrying gametes
 plot(res[,5], type = "l", col = viridis(1, begin = 0.25), main = "Gamete Frequency",
@@ -180,20 +182,43 @@ plot(res[,5], type = "l", col = viridis(1, begin = 0.25), main = "Gamete Frequen
 lines(res[,6], col = viridis(1, begin = 0.25), lwd = 3)
 lines(res[,7], col = viridis(1, begin = 0.75), lwd = 3, lty = 2)
 lines(res[,8], col = viridis(1, begin = 0.75), lwd = 3)
-#abline(h=0, col = "black")
+abline(h=0, col = "black")
 abline(h=1, col = "black")
-points(x=0, y=0.95, pch = 16, col = "red")
-points(x=0, y=0.9, pch = 16, col = "blue")
-points(x=0, y=0.85, pch = 16, col = "green")
-points(x=0, y=0.8, pch = 16, col = "orange")
-text(x=0, y=0.95,
-     paste("Chiasmatic - Female Benefit"), pos=4, cex=.7)
-text(x=0, y=0.9,
-     paste("Chiasmatic - Male Benefit"), pos=4, cex=.7)
-text(x=0, y=0.85,
-     paste("Achiasmatic - Male Benefit"), pos=4, cex=.7)
-text(x=0, y=0.8,
-     paste("Achiasmatic - Female Benefit"), pos=4, cex=.7)
+# points(x=0, y=0.95, pch = 16, col = "red")
+# points(x=0, y=0.9, pch = 16, col = "blue")
+# points(x=0, y=0.85, pch = 16, col = "green")
+# points(x=0, y=0.8, pch = 16, col = "orange")
+# text(x=0, y=0.95,
+#      paste("Chiasmatic - Female Benefit"), pos=4, cex=.7)
+# text(x=0, y=0.9,
+#      paste("Chiasmatic - Male Benefit"), pos=4, cex=.7)
+# text(x=0, y=0.85,
+#      paste("Achiasmatic - Male Benefit"), pos=4, cex=.7)
+# text(x=0, y=0.8,
+#      paste("Achiasmatic - Female Benefit"), pos=4, cex=.7)
+
+# X chromosome
+res <- simLife(h=1,r1=0.1,r2=0.1,s=0.4,me=0.01,gen=1000,aneu=0,option = "X")
+#Plot X-carrying gametes
+par(mfrow=c(1,2))
+plot(res[,1], type = "l", col = viridis(1, begin = 0.25), main = "Gamete Frequency",
+     ylim = c(0, 1), xlim = c(0, length(res[,1])),
+     xlab = "Generation", ylab = "Frequency", lwd = 3, lty = 2)
+lines(res[,2], col = viridis(1, begin = 0.25), lwd = 3)
+lines(res[,3], col = viridis(1, begin = 0.75), lwd = 3, lty = 2)
+lines(res[,4], col = viridis(1, begin = 0.75), lwd = 3)
+abline(h=0, col = "black")
+abline(h=1, col = "black")
+#Plot Y-carrying gametes
+plot(res[,5], type = "l", col = viridis(1, begin = 0.25), main = "Gamete Frequency",
+     ylim = c(0, 1), xlim = c(0, length(res[,1])),
+     xlab = "Generation", ylab = "Frequency", lwd = 3, lty = 2)
+lines(res[,6], col = viridis(1, begin = 0.25), lwd = 3)
+lines(res[,7], col = viridis(1, begin = 0.75), lwd = 3, lty = 2)
+lines(res[,8], col = viridis(1, begin = 0.75), lwd = 3)
+abline(h=0, col = "black")
+abline(h=1, col = "black")
+
 #####
 
 ### Comparing ME and S values ####
