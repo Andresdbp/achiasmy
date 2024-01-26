@@ -295,43 +295,44 @@ layout.matrix <- matrix(c(1, 2, 3, 4), nrow = 1, ncol = 4)
 layout(mat = layout.matrix,
        heights = c(5, 5, 5, 5), 
        widths = c(5, 5, 5, 1))
-par(mar = c(5.1,4.6,4.1,2.1))
+par(mar = c(10.2,9.2,8.2,4.2),
+    mgp = c(5,1.5,0))
 image(resY, col = viridis(100, begin = 0.25, end = 1), yaxt='n', xaxt='n', zlim = c(0,1),
       ylab = "Selection Coefficient",
       xlab = "Deleterious Mutation Effect",
-      main = "Frequency on Y",
-      cex.lab = 1.6,
-      cex.main = 1.8)
+      main = "Frequency on Y\n",
+      cex.lab = 3.2,
+      cex.main = 3.6)
 axis(2, at = seq(from = 0, to = 1, length.out=6),
      labels = seq(from = 0, to = 0.5, length.out=6),
-     cex.axis = 1.3)
+     cex.axis = 2.2)
 axis(1, at = seq(from = 0, to = 1, length.out=6),
      labels = seq(from = 0, to = 0.2, length.out=6),
-     cex.axis = 1.3)
+     cex.axis = 2.2)
 image(resX, col = viridis(100, begin = 0.25), yaxt='n', xaxt='n', zlim = c(0,1),
       ylab = "Selection Coefficient",
       xlab = "Deleterious Mutation Effect",
-      main = "Frequency on X",
-      cex.lab = 1.6,
-      cex.main = 1.8)
+      main = "Frequency on X\n",
+      cex.lab = 3.2,
+      cex.main = 3.6)
 axis(2, at = seq(from = 0, to = 1, length.out=6),
      labels = seq(from = 0, to = 0.5, length.out=6),
-     cex.axis = 1.3)
+     cex.axis = 2.2)
 axis(1, at = seq(from = 0, to = 1, length.out=6),
      labels = seq(from = 0, to = 0.2, length.out=6),
-     cex.axis = 1.3)
+     cex.axis = 2.2)
 image(resA, col = viridis(100, begin = 0.25), yaxt='n', xaxt='n', zlim = c(0,1),
       ylab = "Selection Coefficient",
       xlab = "Deleterious Mutation Effect",
-      main = "Frequency on Autosome",
-      cex.lab = 1.6,
-      cex.main = 1.8)
+      main = "Frequency on Autosome\n",
+      cex.lab = 3.2,
+      cex.main = 3.6)
 axis(2, at = seq(from = 0, to = 1, length.out=6),
      labels = seq(from = 0, to = 0.5, length.out=6),
-     cex.axis = 1.3)
+     cex.axis = 2.2)
 axis(1, at = seq(from = 0, to = 1, length.out=6),
      labels = seq(from = 0, to = 0.2, length.out=6),
-     cex.axis = 1.3)
+     cex.axis = 2.2)
 
 image.plot(resY, col = viridis(100, begin = 0.2), legend.only = T,
            horizontal = F, legend.width = 5, legend.mar = 0,
@@ -340,8 +341,8 @@ image.plot(resY, col = viridis(100, begin = 0.2), legend.only = T,
 
 ### ME vs Aneu ####
 steps <- 200
-mes <- seq(from = 0, to = 0.5, length.out=steps)
-kvals <- seq(from = 0, to = 0.5, length.out=steps)
+mes <- seq(from = 0, to = 0.2, length.out=steps)
+kvals <- seq(from = 0, to = 0.2, length.out=steps)
 gen <- 1000
 
 resY <- resX <- resA <- matrix(NA, steps, steps)
@@ -389,48 +390,50 @@ resA <- as.matrix(read.csv("data/resA-me-k.csv"))
 
 layout.matrix <- matrix(c(1, 2, 3, 4), nrow = 1, ncol = 4)
 layout(mat = layout.matrix,
-       heights = c(5, 5, 5, 5),
+       heights = c(5, 5, 5, 5), 
        widths = c(5, 5, 5, 1))
-par(mar = c(5.1,4.6,4.1,2.1))
+par(mar = c(10.2,9.2,8.2,4.2),
+    mgp = c(5,1.5,0))
 image(resY, col = viridis(100, begin = 0.25, end = 1), yaxt='n', xaxt='n', zlim = c(0,1),
       ylab = "Aneuploidy Rate",
       xlab = "Deleterious Mutation Effect",
       main = "Frequency on Y",
-      cex.lab = 1.6,
-      cex.main = 1.8)
+      cex.lab = 3.2,
+      cex.main = 3.6)
 axis(2, at = seq(from = 0, to = 1, length.out=6),
-     labels = seq(from = 0, to = 0.5, length.out=6),
-     cex.axis = 1.3)
+     labels = seq(from = 0, to = 0.2, length.out=6),
+     cex.axis = 2.2)
 axis(1, at = seq(from = 0, to = 1, length.out=6),
-     labels = seq(from = 0, to = 0.5, length.out=6),
-     cex.axis = 1.3)
+     labels = seq(from = 0, to = 0.2, length.out=6),
+     cex.axis = 2.2)
 image(resX, col = viridis(100, begin = 0.25), yaxt='n', xaxt='n', zlim = c(0,1),
       ylab = "Aneuploidy Rate",
       xlab = "Deleterious Mutation Effect",
       main = "Frequency on X",
-      cex.lab = 1.6,
-      cex.main = 1.8)
+      cex.lab = 3.2,
+      cex.main = 3.6)
 axis(2, at = seq(from = 0, to = 1, length.out=6),
-     labels = seq(from = 0, to = 0.5, length.out=6),
-     cex.axis = 1.3)
+     labels = seq(from = 0, to = 0.2, length.out=6),
+     cex.axis = 2.2)
 axis(1, at = seq(from = 0, to = 1, length.out=6),
-     labels = seq(from = 0, to = 0.5, length.out=6),
-     cex.axis = 1.3)
+     labels = seq(from = 0, to = 0.2, length.out=6),
+     cex.axis = 2.2)
 image(resA, col = viridis(100, begin = 0.25), yaxt='n', xaxt='n', zlim = c(0,1),
       ylab = "Aneuploidy Rate",
       xlab = "Deleterious Mutation Effect",
       main = "Frequency on Autosome",
-      cex.lab = 1.6,
-      cex.main = 1.8)
+      cex.lab = 3.2,
+      cex.main = 3.6)
 axis(2, at = seq(from = 0, to = 1, length.out=6),
-     labels = seq(from = 0, to = 0.5, length.out=6),
-     cex.axis = 1.3)
+     labels = seq(from = 0, to = 0.2, length.out=6),
+     cex.axis = 2.2)
 axis(1, at = seq(from = 0, to = 1, length.out=6),
-     labels = seq(from = 0, to = 0.5, length.out=6),
-     cex.axis = 1.3)
+     labels = seq(from = 0, to = 0.2, length.out=6),
+     cex.axis = 2.2)
 
-image.plot(resY, col = viridis(100, begin = 0.2), legend.only = T,
-           horizontal = F, legend.width = 5, legend.mar = 0,
+par(mfrow=c(1,1))
+image.plot(resY, col = viridis(100, begin = 0.25), legend.only = T,
+           horizontal = T, legend.width = 1, legend.mar = 5,
            legend.shrink = 0.8)
 #####
 
