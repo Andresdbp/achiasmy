@@ -170,7 +170,7 @@ simLife <- function(h = 1, s = 0, r1 = 0, r2 = 0,
 
 ### Individual Runs ####
 # Y chromosome
-res <- simLife(h=1,r1=0.1,r2=0.1,s=0.5,me=0,gen=1000,aneu=0,option = "A")
+res <- simLife(h=1,r1=0.1,r2=0.1,s=0,me=0.1,gen=1000,aneu=0.1,option = "A")
 
 #Plot X-carrying gametes
 par(mfrow=c(1,2))
@@ -299,8 +299,8 @@ par(mar = c(10.2,9.2,8.2,4.2),
     mgp = c(5,1.5,0))
 image(resY, col = viridis(100, begin = 0.25, end = 1), yaxt='n', xaxt='n', zlim = c(0,1),
       ylab = "Selection Coefficient",
-      xlab = "Deleterious Mutation Effect",
-      main = "Frequency on Y\n",
+      xlab = "Mutational Load",
+      main = "Frequency on Y",
       cex.lab = 3.2,
       cex.main = 3.6)
 axis(2, at = seq(from = 0, to = 1, length.out=6),
@@ -311,8 +311,8 @@ axis(1, at = seq(from = 0, to = 1, length.out=6),
      cex.axis = 2.2)
 image(resX, col = viridis(100, begin = 0.25), yaxt='n', xaxt='n', zlim = c(0,1),
       ylab = "Selection Coefficient",
-      xlab = "Deleterious Mutation Effect",
-      main = "Frequency on X\n",
+      xlab = "Mutational Load",
+      main = "Frequency on X",
       cex.lab = 3.2,
       cex.main = 3.6)
 axis(2, at = seq(from = 0, to = 1, length.out=6),
@@ -323,8 +323,8 @@ axis(1, at = seq(from = 0, to = 1, length.out=6),
      cex.axis = 2.2)
 image(resA, col = viridis(100, begin = 0.25), yaxt='n', xaxt='n', zlim = c(0,1),
       ylab = "Selection Coefficient",
-      xlab = "Deleterious Mutation Effect",
-      main = "Frequency on Autosome\n",
+      xlab = "Mutational Load",
+      main = "Frequency on Autosome",
       cex.lab = 3.2,
       cex.main = 3.6)
 axis(2, at = seq(from = 0, to = 1, length.out=6),
@@ -396,7 +396,7 @@ par(mar = c(10.2,9.2,8.2,4.2),
     mgp = c(5,1.5,0))
 image(resY, col = viridis(100, begin = 0.25, end = 1), yaxt='n', xaxt='n', zlim = c(0,1),
       ylab = "Aneuploidy Rate",
-      xlab = "Deleterious Mutation Effect",
+      xlab = "Mutational Load",
       main = "Frequency on Y",
       cex.lab = 3.2,
       cex.main = 3.6)
@@ -408,7 +408,7 @@ axis(1, at = seq(from = 0, to = 1, length.out=6),
      cex.axis = 2.2)
 image(resX, col = viridis(100, begin = 0.25), yaxt='n', xaxt='n', zlim = c(0,1),
       ylab = "Aneuploidy Rate",
-      xlab = "Deleterious Mutation Effect",
+      xlab = "Mutational Load",
       main = "Frequency on X",
       cex.lab = 3.2,
       cex.main = 3.6)
@@ -420,7 +420,7 @@ axis(1, at = seq(from = 0, to = 1, length.out=6),
      cex.axis = 2.2)
 image(resA, col = viridis(100, begin = 0.25), yaxt='n', xaxt='n', zlim = c(0,1),
       ylab = "Aneuploidy Rate",
-      xlab = "Deleterious Mutation Effect",
+      xlab = "Mutational Load",
       main = "Frequency on Autosome",
       cex.lab = 3.2,
       cex.main = 3.6)
