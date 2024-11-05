@@ -6,7 +6,6 @@ library(biomaRt)
 library(dplyr)
 library(tidyr)
 library(tibble)
-library(biomaRt)
 library(topGO)
 library(ggplot2)
 
@@ -20,7 +19,11 @@ library(ggplot2)
 
 
 # Step 1: Connect to Ensembl BioMart
+## Human
 ensembl <- useMart("ensembl", dataset = "hsapiens_gene_ensembl")
+## Fruit Fly
+ensembl <- useMart("ensembl", dataset = "dmelanogaster_gene_ensembl")
+
 
 # Step 2: Verify available attributes
 attributes <- listAttributes(ensembl)
@@ -104,7 +107,7 @@ total_genes <- gene_annotations %>%
 total_genes <- setNames(total_genes$total_genes, total_genes$chromosome_name)
 
 # Step 9: Enrichment analysis for a specific chromosome (e.g., Y chromosome)
-chromosome_of_interest <- "Y"
+chromosome_of_interest <- "X"
 
 p_values <- sapply(rownames(go_counts), function(go_id) {
   perform_fishers_test(go_id, chromosome_of_interest, go_counts, total_genes)
@@ -141,7 +144,12 @@ go_descriptions <- getBM(
   mart = ensembl
 )
 
+sigf_go_desc <- merge(go_descriptions, significant_terms, by = 'go_id')
 
+human_y <- sigf_go_desc
+human_x <- sigf_go_desc
+dmel_y <- sigf_go_desc
+dmel_x <- sigf_go_desc
 
 #TEST
 ensembl <- useMart("ensembl", dataset = "dmelanogaster_gene_ensembl")
