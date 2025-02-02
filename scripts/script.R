@@ -116,7 +116,7 @@ simLife <- function(h = 1, s = 0, r1 = 0, r2 = 0,
         xfr.sp <- (0.5*xfr.e*yfr.s*wm[1,1] + 0.25*xfr.e*yfa.s*wm[2,1] + 0.5*xfr.e*ymr.s*wm[1,2]*(1-r1) + 0.25*xfr.e*yma.s*wm[2,2] + 0.25*xfa.e*yfr.s*wm[2,1] + 0.25*xfa.e*ymr.s*wm[2,2] + 0.5*xmr.e*yfr.s*wm[1,2]*r1)/wbarm
         xfa.sp <- (0.25*xfr.e*yfa.s*wm[2,1] + 0.25*xfr.e*yma.s*wm[2,2] + 0.25*xfa.e*yfr.s*wm[2,1] + 0.5*xfa.e*yfa.s*wm[2,1] + 0.25*xfa.e*ymr.s*wm[2,2] + 0.5*xfa.e*yma.s*wm[2,2])/wbarm
         xmr.sp <- (0.5*xfr.e*ymr.s*wm[1,2]*r1 + 0.5*xmr.e*yfr.s*wm[1,2]*(1-r1) + 0.25*xmr.e*yfa.s*wm[2,2] + 0.5*xmr.e*ymr.s*wm[1,3] + 0.25*xmr.e*yma.s*wm[2,3] + 0.25*xma.e*yfr.s*wm[2,2] + 0.25*xma.e*ymr.s*wm[2,3])/wbarm
-        xma.sp <- (0.25*xmr.e*yfa.s*wm[2,2] + 0.25*xmr.e*yma.s*wm[2,3] + 0.25*xma.e*yfr.s*wm[2,2] + 0.25*xma.e*yfa.s*wm[2,2] + 0.25*xma.e*ymr.s*wm[2,3] + 0.5*xma.e*yma.s*wm[2,3])/wbarm
+        xma.sp <- (0.25*xmr.e*yfa.s*wm[2,2] + 0.25*xmr.e*yma.s*wm[2,3] + 0.25*xma.e*yfr.s*wm[2,2] + 0.5*xma.e*yfa.s*wm[2,2] + 0.25*xma.e*ymr.s*wm[2,3] + 0.5*xma.e*yma.s*wm[2,3])/wbarm
         
         yfr.sp <- (0.5*xfr.e*yfr.s*wm[1,1] + 0.25*xfr.e*yfa.s*wm[2,1] + 0.5*xfr.e*ymr.s*wm[1,2]*r1 + 0.25*xfa.e*yfr.s*wm[2,1] + 0.5*xmr.e*yfr.s*wm[1,2]*(1-r1) + 0.25*xmr.e*yfa.s*wm[2,2] + 0.25*xma.e*yfr.s*wm[2,2])/wbarm
         yfa.sp <- (0.25*xfr.e*yfa.s*wm[2,1] + 0.25*xfa.e*yfr.s*wm[2,1] + 0.5*xfa.e*yfa.s*wm[2,1] + 0.25*xmr.e*yfa.s*wm[2,2] + 0.25*xma.e*yfr.s*wm[2,2] + 0.25*xma.e*yfa.s*wm[2,2])/wbarm
@@ -170,7 +170,38 @@ simLife <- function(h = 1, s = 0, r1 = 0, r2 = 0,
 
 ### Individual Runs ####
 # Y chromosome
-res <- simLife(h=1,r1=0.1,r2=0.1,s=0.5,me=0,gen=1000,aneu=0,option = "A")
+res <- simLife(h=1,r1=0.1,r2=0.1,s=0,me=0.1,gen=1000,aneu=0.1,option = "Y")
+
+#Comparison across chromosomes
+## SA
+par(mfrow=c(2,1), mar=c(6, 6, 4, 1), oma = c(2, 2, 0, 5))
+res <- simLife(h=1,r1=0.1,r2=0.1,s=0.5,me=0.001,gen=1500,aneu=0,option = "Y")
+plot((res[,6]+res[,8]), type = "l", col = "#317ec2", main = "Gamete Frequency\n Sexual Antagonism",
+     ylim = c(0, 1), xlim = c(0, length(res[,1])),
+     xlab = "", ylab = "Frequency", lwd = 3, cex.lab = 1.3)
+abline(v=150, lty=3, lwd = 2, col = "#317ec2")
+res <- simLife(h=1,r1=0.1,r2=0.1,s=0.5,me=0.001,gen=1500,aneu=0,option = "X")
+lines((res[,2]+res[,4]), col = "#c03830", lwd = 3)
+abline(v=600, lty=3, lwd = 2, col = "#c03830")
+res <- simLife(h=1,r1=0.1,r2=0.1,s=0.5,me=0.001,gen=1500,aneu=0,option = "A")
+lines((res[,2]+res[,4]+res[,6]+res[,8])/2, col = "#5aaa46", lwd = 3)
+abline(v=1400, lty=3, lwd = 2, col = "#5aaa46")
+## Legend
+legend(x=650, y=0.25, legend = c("Y Chromosome", "X Chromosome", "Autosomes", "Dotted Lines: Equilbrium Point"),
+       col = c("#317ec2", "#c03830", "#5aaa46", "black"), lty = c(1, 1, 1, 3), lwd = c(3, 3, 3, 2), bty ="n")
+## Aneu
+res <- simLife(h=1,r1=0.1,r2=0.1,s=0,me=0.1,gen=1000,aneu=0.1,option = "Y")
+plot((res[,6]+res[,8]), type = "l", col = "#317ec2", main = "Gamete Frequency\n Heteromorphy-Dependant Aneuploidy",
+     ylim = c(0, 1), xlim = c(0, length(res[,1])),
+     xlab = "Generation", ylab = "Frequency", lwd = 3, cex.lab = 1.3)
+abline(v=150, lty=3, lwd = 2, col = "#317ec2")
+res <- simLife(h=1,r1=0.1,r2=0.1,s=0,me=0.1,gen=1000,aneu=0.1,option = "X")
+lines((res[,2]+res[,4]), col = "#c03830", lwd = 3)
+abline(v=580, lty=3, lwd = 2, col = "#c03830")
+res <- simLife(h=1,r1=0.1,r2=0.1,s=0,me=0.1,gen=1000,aneu=0.1,option = "A")
+lines((res[,2]+res[,4]+res[,6]+res[,8])/2, col = "#5aaa46", lwd = 3)
+abline(v=950, lty=3, lwd = 2, col = "#5aaa46")
+
 
 #Plot X-carrying gametes
 par(mfrow=c(1,2))
@@ -299,8 +330,8 @@ par(mar = c(10.2,9.2,8.2,4.2),
     mgp = c(5,1.5,0))
 image(resY, col = viridis(100, begin = 0.25, end = 1), yaxt='n', xaxt='n', zlim = c(0,1),
       ylab = "Selection Coefficient",
-      xlab = "Deleterious Mutation Effect",
-      main = "Frequency on Y\n",
+      xlab = "Mutational Load",
+      main = "Frequency on Y",
       cex.lab = 3.2,
       cex.main = 3.6)
 axis(2, at = seq(from = 0, to = 1, length.out=6),
@@ -311,8 +342,8 @@ axis(1, at = seq(from = 0, to = 1, length.out=6),
      cex.axis = 2.2)
 image(resX, col = viridis(100, begin = 0.25), yaxt='n', xaxt='n', zlim = c(0,1),
       ylab = "Selection Coefficient",
-      xlab = "Deleterious Mutation Effect",
-      main = "Frequency on X\n",
+      xlab = "Mutational Load",
+      main = "Frequency on X",
       cex.lab = 3.2,
       cex.main = 3.6)
 axis(2, at = seq(from = 0, to = 1, length.out=6),
@@ -323,8 +354,8 @@ axis(1, at = seq(from = 0, to = 1, length.out=6),
      cex.axis = 2.2)
 image(resA, col = viridis(100, begin = 0.25), yaxt='n', xaxt='n', zlim = c(0,1),
       ylab = "Selection Coefficient",
-      xlab = "Deleterious Mutation Effect",
-      main = "Frequency on Autosome\n",
+      xlab = "Mutational Load",
+      main = "Frequency on Autosome",
       cex.lab = 3.2,
       cex.main = 3.6)
 axis(2, at = seq(from = 0, to = 1, length.out=6),
@@ -396,7 +427,7 @@ par(mar = c(10.2,9.2,8.2,4.2),
     mgp = c(5,1.5,0))
 image(resY, col = viridis(100, begin = 0.25, end = 1), yaxt='n', xaxt='n', zlim = c(0,1),
       ylab = "Aneuploidy Rate",
-      xlab = "Deleterious Mutation Effect",
+      xlab = "Mutational Load",
       main = "Frequency on Y",
       cex.lab = 3.2,
       cex.main = 3.6)
@@ -408,7 +439,7 @@ axis(1, at = seq(from = 0, to = 1, length.out=6),
      cex.axis = 2.2)
 image(resX, col = viridis(100, begin = 0.25), yaxt='n', xaxt='n', zlim = c(0,1),
       ylab = "Aneuploidy Rate",
-      xlab = "Deleterious Mutation Effect",
+      xlab = "Mutational Load",
       main = "Frequency on X",
       cex.lab = 3.2,
       cex.main = 3.6)
@@ -420,7 +451,7 @@ axis(1, at = seq(from = 0, to = 1, length.out=6),
      cex.axis = 2.2)
 image(resA, col = viridis(100, begin = 0.25), yaxt='n', xaxt='n', zlim = c(0,1),
       ylab = "Aneuploidy Rate",
-      xlab = "Deleterious Mutation Effect",
+      xlab = "Mutational Load",
       main = "Frequency on Autosome",
       cex.lab = 3.2,
       cex.main = 3.6)
