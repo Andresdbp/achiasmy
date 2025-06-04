@@ -15,10 +15,11 @@ setwd("~/Documents/GitHub/achiasmy")
 ## gen - generations
 ## me - mutation effect
 ## u - mutation rate
+## acs - achiasmatic coding sites, sites that transition to achiasmy
 
 ## Main Function
-simLife <- function(h = 1, s = 0, r1 = 0, r2 = 0,
-                    gen = 1000, me = 0.001, u = 0.001,
+simLife <- function(h = 1, s = 0.1, r1 = 0.1, r2 = 0.1,
+                    gen = 1000, me = 0.003, u = 1e-09, acs = 5e+06,
                     aneu=0, option="Y"){
   #TODO
   # mutational load
@@ -29,6 +30,9 @@ simLife <- function(h = 1, s = 0, r1 = 0, r2 = 0,
   wm <- matrix(c(1-aneu, 1-ml, (1+h*s)*(1-aneu), (1+h*s)*(1-ml), (1+s)*(1-aneu), (1+s)*(1-ml)), 2, 3)
   
   # Initial gamete frequencies
+  # Autosomes: new mutation frequency = 1/(2N)
+  # X chromosome: new mutation frequency = 2/(3N)
+  # Y chromosome: new mutation frequency = 2/(N)
   if (option == "Y") {
     # eggs
     xfr.e <- 0.5
@@ -45,39 +49,42 @@ simLife <- function(h = 1, s = 0, r1 = 0, r2 = 0,
     ymr.s <- 0.24995
     yma.s <- 0.00005
   }
+  
   if (option == "X") {
     # eggs
-    xfr.e <- 0.499925
-    xfa.e <- 0.000075
-    xmr.e <- 0.499925
-    xma.e <- 0.000075
+    xfa.e <- 0.0001
+    xfr.e <- 0.4999
+    xma.e <- 0.0001
+    xmr.e <- 0.4999
     # sperm
-    xfr.s <- 0.249925
-    xfa.s <- 0.000025
-    xmr.s <- 0.249925
-    xma.s <- 0.000025
+    xfa.s <- 0.00005
+    xfr.s <- 0.24995
+    xma.s <- 0.00005
+    xmr.s <- 0.24995
     yfr.s <- 0.25
     yfa.s <- 0
     ymr.s <- 0.25
     yma.s <- 0
   }
+  
   if (option == "A") {
     # eggs
-    xfr.e <- 0.49995
-    xfa.e <- 0.00005
-    xmr.e <- 0.49995
-    xma.e <- 0.00005
+    xfa.e <- 0.0001
+    xfr.e <- 0.4999
+    xma.e <- 0.0001
+    xmr.e <- 0.4999
     # sperm
-    xfr.s <- 0.249975
-    xfa.s <- 0.000025
-    xmr.s <- 0.249975
-    xma.s <- 0.000025
-    yfr.s <- 0.249975
-    yfa.s <- 0.000025
-    ymr.s <- 0.249975
-    yma.s <- 0.000025
+    xfa.s <- 0.00005
+    xfr.s <- 0.24995
+    xma.s <- 0.00005
+    xmr.s <- 0.24995
+    yfa.s <- 0.00005
+    yfr.s <- 0.24995
+    yma.s <- 0.00005
+    ymr.s <- 0.24995
   }
-
+  
+  
   results <- matrix(NA,gen,8)
   colnames(results) <- c("Xfr", "Xfa", "Xmr", "Xma","Yfr", "Yfa", "Ymr", "Yma")
   results[1,1] <- (xfr.e+xfr.s)/1.5
@@ -149,8 +156,8 @@ simLife <- function(h = 1, s = 0, r1 = 0, r2 = 0,
       results[i,8] <- yma.s/0.5
       
       #increase mutational load
-      ml <- ml + me*u
-      
+      #ml <- ml + me*u*acs
+      ml <- 1 - ( (1 - me)^(u * acs * i) )
       #recalculate male fitness after mutational load changes
       wm <- matrix(c(1-aneu, 1-ml, (1+h*s)*(1-aneu), (1+h*s)*(1-ml), (1+s)*(1-aneu), (1+s)*(1-ml)), 2, 3)
     }
@@ -170,37 +177,45 @@ simLife <- function(h = 1, s = 0, r1 = 0, r2 = 0,
 
 ### Individual Runs ####
 # Y chromosome
-res <- simLife(h=1,r1=0.1,r2=0.1,s=0,me=0.1,gen=1000,aneu=0.1,option = "Y")
+par(mfrow=c(1,1), mar=c(6, 6, 4, 1), oma = c(2, 2, 0, 5))
+
+res <- simLife(h = 1, s = 0.01, r1 = 0.1, r2 = 0.1,
+               gen = 5000, me = 0.001, u = 1e-09, acs = 2e+07,
+               aneu=0, option="Y")
+
+plot((res[,6]+res[,8]), type = "l", col = "#317ec2", main = "Gamete Frequency\n Sexual Antagonism",
+     ylim = c(0, 1), xlim = c(0, length(res[,1])),
+     xlab = "", ylab = "Frequency", lwd = 3, cex.lab = 1.3)
 
 #Comparison across chromosomes
 ## SA
-par(mfrow=c(2,1), mar=c(6, 6, 4, 1), oma = c(2, 2, 0, 5))
-res <- simLife(h=1,r1=0.1,r2=0.1,s=0.5,me=0.001,gen=1500,aneu=0,option = "Y")
+#par(mfrow=c(2,1), mar=c(6, 6, 4, 1), oma = c(2, 2, 0, 5))
+res <- simLife(h=1,r1=0.1,r2=0.1,s=0.5,gen=3000,aneu=0,option = "Y")
 plot((res[,6]+res[,8]), type = "l", col = "#317ec2", main = "Gamete Frequency\n Sexual Antagonism",
      ylim = c(0, 1), xlim = c(0, length(res[,1])),
      xlab = "", ylab = "Frequency", lwd = 3, cex.lab = 1.3)
 abline(v=150, lty=3, lwd = 2, col = "#317ec2")
-res <- simLife(h=1,r1=0.1,r2=0.1,s=0.5,me=0.001,gen=1500,aneu=0,option = "X")
+res <- simLife(h=1,r1=0.1,r2=0.1,s=0.5,gen=3000,aneu=0,option = "X")
 lines((res[,2]+res[,4]), col = "#c03830", lwd = 3)
-abline(v=600, lty=3, lwd = 2, col = "#c03830")
-res <- simLife(h=1,r1=0.1,r2=0.1,s=0.5,me=0.001,gen=1500,aneu=0,option = "A")
+abline(v=650, lty=3, lwd = 2, col = "#c03830")
+res <- simLife(h=1,r1=0.1,r2=0.1,s=0.5,gen=3000,aneu=0,option = "A")
 lines((res[,2]+res[,4]+res[,6]+res[,8])/2, col = "#5aaa46", lwd = 3)
-abline(v=1400, lty=3, lwd = 2, col = "#5aaa46")
+abline(v=2700, lty=3, lwd = 2, col = "#5aaa46")
 ## Legend
-legend(x=650, y=0.25, legend = c("Y Chromosome", "X Chromosome", "Autosomes", "Dotted Lines: Equilbrium Point"),
-       col = c("#317ec2", "#c03830", "#5aaa46", "black"), lty = c(1, 1, 1, 3), lwd = c(3, 3, 3, 2), bty ="n")
+legend(x=1200, y=0.3, legend = c("Y Chromosome", "X Chromosome", "Autosomes", "Dotted Lines: Equilbrium Point"),
+       col = c("#317ec2", "#c03830", "#5aaa46", "black"), lty = c(1, 1, 1, 3), lwd = c(6, 6, 6, 3), bty ="n", cex = 1.2)
 ## Aneu
-res <- simLife(h=1,r1=0.1,r2=0.1,s=0,me=0.1,gen=1000,aneu=0.1,option = "Y")
+res <- simLife(h=1,r1=0.1,r2=0.1,s=0,gen=3000,aneu=0.1,option = "Y")
 plot((res[,6]+res[,8]), type = "l", col = "#317ec2", main = "Gamete Frequency\n Heteromorphy-Dependant Aneuploidy",
      ylim = c(0, 1), xlim = c(0, length(res[,1])),
      xlab = "Generation", ylab = "Frequency", lwd = 3, cex.lab = 1.3)
 abline(v=150, lty=3, lwd = 2, col = "#317ec2")
-res <- simLife(h=1,r1=0.1,r2=0.1,s=0,me=0.1,gen=1000,aneu=0.1,option = "X")
+res <- simLife(h=1,r1=0.1,r2=0.1,s=0,gen=3000,aneu=0.1,option = "X")
 lines((res[,2]+res[,4]), col = "#c03830", lwd = 3)
-abline(v=580, lty=3, lwd = 2, col = "#c03830")
-res <- simLife(h=1,r1=0.1,r2=0.1,s=0,me=0.1,gen=1000,aneu=0.1,option = "A")
+abline(v=450, lty=3, lwd = 2, col = "#c03830")
+res <- simLife(h=1,r1=0.1,r2=0.1,s=0,gen=3000,aneu=0.1,option = "A")
 lines((res[,2]+res[,4]+res[,6]+res[,8])/2, col = "#5aaa46", lwd = 3)
-abline(v=950, lty=3, lwd = 2, col = "#5aaa46")
+abline(v=1950, lty=3, lwd = 2, col = "#5aaa46")
 
 
 #Plot X-carrying gametes
@@ -274,150 +289,158 @@ abline(h=1, col = "black")
 
 ### Comparing ME and S values ####
 steps <- 200
-mes <- seq(from = 0, to = 0.2, length.out=steps)
+acss <- seq(from = 0, to = 5e+06, length.out=steps)
 svals <- seq(from = 0, to = 0.5, length.out=steps)
 gen <- 1000
 
 resY <- resX <- resA <- matrix(NA, steps, steps)
-row.names(resY) <- row.names(resX) <- row.names(resA) <- paste("me.", round(mes, 3), sep="")
+row.names(resY) <- row.names(resX) <- row.names(resA) <- paste("acs.", round(acss, 3), sep="")
 colnames(resY) <- colnames(resX)<- colnames(resA) <- paste("sval.", round(svals, 3), sep="")
 
+## h1-r01
 # Y mutation
 for (i in 1:steps) { # cycles through the mutational effects factors
-  print(paste("working on me", i))
+  print(paste("working on acs", i))
   for (j in 1:steps) { # cycles through the selection coef.
     res <- simLife(r2 = 0.1, r1 = 0.1, h=1,
-                   s = svals[j], me = mes[i],
+                   s = svals[j], acs = acss[i],
                    gen = gen, option = "Y")
     resY[i, j] <- (res[gen,6]+res[gen,8])
   }
 }
 # X mutation
 for (i in 1:steps) { # cycles through the mutational effects factors
-  print(paste("working on me", i))
+  print(paste("working on acs", i))
   for (j in 1:steps) { # cycles through the selection coef.
     res <- simLife(r2 = 0.1, r1 = 0.1, h=1,
-                   s = svals[j], me = mes[i],
+                   s = svals[j], acs = acss[i],
                    gen = gen, option = "X")
     resX[i, j] <- (res[gen,2]+res[gen,4])
   }
 }
 # Autosome Mutation
 for (i in 1:steps) { # cycles through the mutational effects factors
-  print(paste("working on me", i))
+  print(paste("working on acs", i))
   for (j in 1:steps) { # cycles through the selection coef.
     res <- simLife(r2 = 0.1, r1 = 0.1, h=1,
-                   s = svals[j], me = mes[i],
+                   s = svals[j], acs = acss[i],
                    gen = gen, option = "A")
     resA[i, j] <- (((res[gen,2]+res[gen,4])*1.5)+((res[gen,6]+res[gen,8])*0.5))/2
   }
 }
-write.csv(resY, file = "data/resY-me-s.csv", row.names = F)
-write.csv(resX, file = "data/resX-me-s.csv", row.names = F)
-write.csv(resA, file = "data/resA-me-s.csv", row.names = F)
+write.csv(resY, file = "data/resY-h1-r01.csv", row.names = F)
+write.csv(resX, file = "data/resX-h1-r01.csv", row.names = F)
+write.csv(resA, file = "data/resA-h1-r01.csv", row.names = F)
 
-
-# Plotting
-resY <- as.matrix(read.csv("data/resY-me-s.csv"))
-resX <- as.matrix(read.csv("data/resX-me-s.csv"))
-resA <- as.matrix(read.csv("data/resA-me-s.csv"))
-
-layout.matrix <- matrix(c(1, 2, 3, 4), nrow = 1, ncol = 4)
-layout(mat = layout.matrix,
-       heights = c(5, 5, 5, 5), 
-       widths = c(5, 5, 5, 1))
-par(mar = c(10.2,9.2,8.2,4.2),
-    mgp = c(5,1.5,0))
-image(resY, col = viridis(100, begin = 0.25, end = 1), yaxt='n', xaxt='n', zlim = c(0,1),
-      ylab = "Selection Coefficient",
-      xlab = "Mutational Load",
-      main = "Frequency on Y",
-      cex.lab = 3.2,
-      cex.main = 3.6)
-axis(2, at = seq(from = 0, to = 1, length.out=6),
-     labels = seq(from = 0, to = 0.5, length.out=6),
-     cex.axis = 2.2)
-axis(1, at = seq(from = 0, to = 1, length.out=6),
-     labels = seq(from = 0, to = 0.2, length.out=6),
-     cex.axis = 2.2)
-image(resX, col = viridis(100, begin = 0.25), yaxt='n', xaxt='n', zlim = c(0,1),
-      ylab = "Selection Coefficient",
-      xlab = "Mutational Load",
-      main = "Frequency on X",
-      cex.lab = 3.2,
-      cex.main = 3.6)
-axis(2, at = seq(from = 0, to = 1, length.out=6),
-     labels = seq(from = 0, to = 0.5, length.out=6),
-     cex.axis = 2.2)
-axis(1, at = seq(from = 0, to = 1, length.out=6),
-     labels = seq(from = 0, to = 0.2, length.out=6),
-     cex.axis = 2.2)
-image(resA, col = viridis(100, begin = 0.25), yaxt='n', xaxt='n', zlim = c(0,1),
-      ylab = "Selection Coefficient",
-      xlab = "Mutational Load",
-      main = "Frequency on Autosome",
-      cex.lab = 3.2,
-      cex.main = 3.6)
-axis(2, at = seq(from = 0, to = 1, length.out=6),
-     labels = seq(from = 0, to = 0.5, length.out=6),
-     cex.axis = 2.2)
-axis(1, at = seq(from = 0, to = 1, length.out=6),
-     labels = seq(from = 0, to = 0.2, length.out=6),
-     cex.axis = 2.2)
-
-image.plot(resY, col = viridis(100, begin = 0.2), legend.only = T,
-           horizontal = F, legend.width = 5, legend.mar = 0,
-           legend.shrink = 0.8)
-#####
-
-### ME vs Aneu ####
-steps <- 200
-mes <- seq(from = 0, to = 0.2, length.out=steps)
-kvals <- seq(from = 0, to = 0.2, length.out=steps)
-gen <- 1000
-
-resY <- resX <- resA <- matrix(NA, steps, steps)
-row.names(resY) <- row.names(resX) <- row.names(resA) <- paste("me.", round(mes, 3), sep="")
-colnames(resY) <- colnames(resX)<- colnames(resA) <- paste("kval.", round(kvals, 3), sep="")
-
+## h05-r01
 # Y mutation
 for (i in 1:steps) { # cycles through the mutational effects factors
-  print(paste("working on me", i))
-  for (j in 1:steps) { # cycles through aneuploidy rates (k)
-    res <- simLife(r2 = 0.1, r1 = 0.1, h=1, s=0,
-                   aneu = kvals[j], me = mes[i],
+  print(paste("working on acs", i))
+  for (j in 1:steps) { # cycles through the selection coef.
+    res <- simLife(r2 = 0.1, r1 = 0.1, h=0.5,
+                   s = svals[j], acs = acss[i],
                    gen = gen, option = "Y")
     resY[i, j] <- (res[gen,6]+res[gen,8])
   }
 }
 # X mutation
 for (i in 1:steps) { # cycles through the mutational effects factors
-  print(paste("working on me", i))
-  for (j in 1:steps) { # cycles through aneuploidy rates (k)
-    res <- simLife(r2 = 0.1, r1 = 0.1, h=1, s=0,
-                   aneu = kvals[j], me = mes[i],
+  print(paste("working on acs", i))
+  for (j in 1:steps) { # cycles through the selection coef.
+    res <- simLife(r2 = 0.1, r1 = 0.1, h=0.5,
+                   s = svals[j], acs = acss[i],
                    gen = gen, option = "X")
     resX[i, j] <- (res[gen,2]+res[gen,4])
   }
 }
-# A mutation
+# Autosome Mutation
 for (i in 1:steps) { # cycles through the mutational effects factors
-  print(paste("working on me", i))
-  for (j in 1:steps) { # cycles through aneuploidy rates (k)
-    res <- simLife(r2 = 0.1, r1 = 0.1, h=1, s=0,
-                   aneu = kvals[j], me = mes[i],
+  print(paste("working on acs", i))
+  for (j in 1:steps) { # cycles through the selection coef.
+    res <- simLife(r2 = 0.1, r1 = 0.1, h=0.5,
+                   s = svals[j], acs = acss[i],
                    gen = gen, option = "A")
     resA[i, j] <- (((res[gen,2]+res[gen,4])*1.5)+((res[gen,6]+res[gen,8])*0.5))/2
   }
 }
-write.csv(resY, file = "data/resY-me-k.csv", row.names = F)
-write.csv(resX, file = "data/resX-me-k.csv", row.names = F)
-write.csv(resA, file = "data/resA-me-k.csv", row.names = F)
+write.csv(resY, file = "data/resY-h05-r01.csv", row.names = F)
+write.csv(resX, file = "data/resX-h05-r01.csv", row.names = F)
+write.csv(resA, file = "data/resA-h05-r01.csv", row.names = F)
 
-# Plotting
-resY <- as.matrix(read.csv("data/resY-me-k.csv"))
-resX <- as.matrix(read.csv("data/resX-me-k.csv"))
-resA <- as.matrix(read.csv("data/resA-me-k.csv"))
+## h0-r01
+# Y mutation
+for (i in 1:steps) { # cycles through the mutational effects factors
+  print(paste("working on acs", i))
+  for (j in 1:steps) { # cycles through the selection coef.
+    res <- simLife(r2 = 0.1, r1 = 0.1, h=0,
+                   s = svals[j], acs = acss[i],
+                   gen = gen, option = "Y")
+    resY[i, j] <- (res[gen,6]+res[gen,8])
+  }
+}
+# X mutation
+for (i in 1:steps) { # cycles through the mutational effects factors
+  print(paste("working on acs", i))
+  for (j in 1:steps) { # cycles through the selection coef.
+    res <- simLife(r2 = 0.1, r1 = 0.1, h=0,
+                   s = svals[j], acs = acss[i],
+                   gen = gen, option = "X")
+    resX[i, j] <- (res[gen,2]+res[gen,4])
+  }
+}
+# Autosome Mutation
+for (i in 1:steps) { # cycles through the mutational effects factors
+  print(paste("working on acs", i))
+  for (j in 1:steps) { # cycles through the selection coef.
+    res <- simLife(r2 = 0.1, r1 = 0.1, h=0,
+                   s = svals[j], acs = acss[i],
+                   gen = gen, option = "A")
+    resA[i, j] <- (((res[gen,2]+res[gen,4])*1.5)+((res[gen,6]+res[gen,8])*0.5))/2
+  }
+}
+write.csv(resY, file = "data/resY-h0-r01.csv", row.names = F)
+write.csv(resX, file = "data/resX-h0-r01.csv", row.names = F)
+write.csv(resA, file = "data/resA-h0-r01.csv", row.names = F)
+
+## h1-r03
+# Y mutation
+for (i in 1:steps) { # cycles through the mutational effects factors
+  print(paste("working on acs", i))
+  for (j in 1:steps) { # cycles through the selection coef.
+    res <- simLife(r2 = 0.1, r1 = 0.3, h=1,
+                   s = svals[j], acs = acss[i],
+                   gen = gen, option = "Y")
+    resY[i, j] <- (res[gen,6]+res[gen,8])
+  }
+}
+# X mutation
+for (i in 1:steps) { # cycles through the mutational effects factors
+  print(paste("working on acs", i))
+  for (j in 1:steps) { # cycles through the selection coef.
+    res <- simLife(r2 = 0.1, r1 = 0.3, h=1,
+                   s = svals[j], acs = acss[i],
+                   gen = gen, option = "X")
+    resX[i, j] <- (res[gen,2]+res[gen,4])
+  }
+}
+# Autosome Mutation
+for (i in 1:steps) { # cycles through the mutational effects factors
+  print(paste("working on acs", i))
+  for (j in 1:steps) { # cycles through the selection coef.
+    res <- simLife(r2 = 0.1, r1 = 0.3, h=1,
+                   s = svals[j], acs = acss[i],
+                   gen = gen, option = "A")
+    resA[i, j] <- (((res[gen,2]+res[gen,4])*1.5)+((res[gen,6]+res[gen,8])*0.5))/2
+  }
+}
+write.csv(resY, file = "data/resY-h1-r03.csv", row.names = F)
+write.csv(resX, file = "data/resX-h1-r03.csv", row.names = F)
+write.csv(resA, file = "data/resA-h1-r03.csv", row.names = F)
+
+#### h1-r01 plot ####
+resY <- as.matrix(read.csv("data/resY-h1-r01.csv"))
+resX <- as.matrix(read.csv("data/resX-h1-r01.csv"))
+resA <- as.matrix(read.csv("data/resA-h1-r01.csv"))
 
 layout.matrix <- matrix(c(1, 2, 3, 4), nrow = 1, ncol = 4)
 layout(mat = layout.matrix,
@@ -425,47 +448,300 @@ layout(mat = layout.matrix,
        widths = c(5, 5, 5, 1))
 par(mar = c(10.2,9.2,8.2,4.2),
     mgp = c(5,1.5,0))
-image(resY, col = viridis(100, begin = 0.25, end = 1), yaxt='n', xaxt='n', zlim = c(0,1),
-      ylab = "Aneuploidy Rate",
-      xlab = "Mutational Load",
+image(resY, col = viridis::mako(4000), yaxt='n', xaxt='n', zlim = c(0,1),
+      ylab = "Selection Coefficient",
+      xlab = "",
       main = "Frequency on Y",
       cex.lab = 3.2,
       cex.main = 3.6)
 axis(2, at = seq(from = 0, to = 1, length.out=6),
-     labels = seq(from = 0, to = 0.2, length.out=6),
+     labels = seq(from = 0, to = 0.5, length.out=6),
      cex.axis = 2.2)
 axis(1, at = seq(from = 0, to = 1, length.out=6),
-     labels = seq(from = 0, to = 0.2, length.out=6),
+     labels = seq(from = 0, to = 5, length.out=6),
      cex.axis = 2.2)
-image(resX, col = viridis(100, begin = 0.25), yaxt='n', xaxt='n', zlim = c(0,1),
-      ylab = "Aneuploidy Rate",
-      xlab = "Mutational Load",
+image(resX, col = viridis::mako(4000), yaxt='n', xaxt='n', zlim = c(0,1),
+      ylab = "Selection Coefficient",
+      xlab = "Coding Sites Transitioning to Achiasmy (Mb)",
       main = "Frequency on X",
       cex.lab = 3.2,
       cex.main = 3.6)
 axis(2, at = seq(from = 0, to = 1, length.out=6),
-     labels = seq(from = 0, to = 0.2, length.out=6),
+     labels = seq(from = 0, to = 0.5, length.out=6),
      cex.axis = 2.2)
 axis(1, at = seq(from = 0, to = 1, length.out=6),
-     labels = seq(from = 0, to = 0.2, length.out=6),
+     labels = seq(from = 0, to = 5, length.out=6),
      cex.axis = 2.2)
-image(resA, col = viridis(100, begin = 0.25), yaxt='n', xaxt='n', zlim = c(0,1),
-      ylab = "Aneuploidy Rate",
-      xlab = "Mutational Load",
+image(resA, col = viridis::mako(4000), yaxt='n', xaxt='n', zlim = c(0,1),
+      ylab = "Selection Coefficient",
+      xlab = "",
       main = "Frequency on Autosome",
       cex.lab = 3.2,
       cex.main = 3.6)
 axis(2, at = seq(from = 0, to = 1, length.out=6),
-     labels = seq(from = 0, to = 0.2, length.out=6),
+     labels = seq(from = 0, to = 0.5, length.out=6),
      cex.axis = 2.2)
 axis(1, at = seq(from = 0, to = 1, length.out=6),
-     labels = seq(from = 0, to = 0.2, length.out=6),
+     labels = seq(from = 0, to = 5, length.out=6),
      cex.axis = 2.2)
 
-par(mfrow=c(1,1))
-image.plot(resY, col = viridis(100, begin = 0.25), legend.only = T,
-           horizontal = T, legend.width = 1, legend.mar = 5,
-           legend.shrink = 0.8)
+# image.plot(resY, col = viridis::mako(4000), legend.only = T,
+#            horizontal = F, legend.width = 4, legend.mar = 0,
+#            legend.shrink = 0.8)
+#####
+#### h05-r01 plot ####
+resY <- as.matrix(read.csv("data/resY-h05-r01.csv"))
+resX <- as.matrix(read.csv("data/resX-h05-r01.csv"))
+resA <- as.matrix(read.csv("data/resA-h05-r01.csv"))
+
+layout.matrix <- matrix(c(1, 2, 3, 4), nrow = 1, ncol = 4)
+layout(mat = layout.matrix,
+       heights = c(5, 5, 5, 5), 
+       widths = c(5, 5, 5, 1))
+par(mar = c(10.2,9.2,8.2,4.2),
+    mgp = c(5,1.5,0))
+image(resY, col = viridis::mako(4000), yaxt='n', xaxt='n', zlim = c(0,1),
+      ylab = "Selection Coefficient",
+      xlab = "",
+      main = "Frequency on Y",
+      cex.lab = 3.2,
+      cex.main = 3.6)
+axis(2, at = seq(from = 0, to = 1, length.out=6),
+     labels = seq(from = 0, to = 0.5, length.out=6),
+     cex.axis = 2.2)
+axis(1, at = seq(from = 0, to = 1, length.out=6),
+     labels = seq(from = 0, to = 5, length.out=6),
+     cex.axis = 2.2)
+image(resX, col = viridis::mako(4000), yaxt='n', xaxt='n', zlim = c(0,1),
+      ylab = "Selection Coefficient",
+      xlab = "Coding Sites Transitioning to Achiasmy (Mb)",
+      main = "Frequency on X",
+      cex.lab = 3.2,
+      cex.main = 3.6)
+axis(2, at = seq(from = 0, to = 1, length.out=6),
+     labels = seq(from = 0, to = 0.5, length.out=6),
+     cex.axis = 2.2)
+axis(1, at = seq(from = 0, to = 1, length.out=6),
+     labels = seq(from = 0, to = 5, length.out=6),
+     cex.axis = 2.2)
+image(resA, col = viridis::mako(4000), yaxt='n', xaxt='n', zlim = c(0,1),
+      ylab = "Selection Coefficient",
+      xlab = "",
+      main = "Frequency on Autosome",
+      cex.lab = 3.2,
+      cex.main = 3.6)
+axis(2, at = seq(from = 0, to = 1, length.out=6),
+     labels = seq(from = 0, to = 0.5, length.out=6),
+     cex.axis = 2.2)
+axis(1, at = seq(from = 0, to = 1, length.out=6),
+     labels = seq(from = 0, to = 5, length.out=6),
+     cex.axis = 2.2)
+
+# image.plot(resY, col = viridis::mako(4000), legend.only = T,
+#            horizontal = F, legend.width = 5, legend.mar = 0,
+#            legend.shrink = 0.8)
+#####
+#### h0-r01 plot ####
+resY <- as.matrix(read.csv("data/resY-h0-r01.csv"))
+resX <- as.matrix(read.csv("data/resX-h0-r01.csv"))
+resA <- as.matrix(read.csv("data/resA-h0-r01.csv"))
+
+layout.matrix <- matrix(c(1, 2, 3, 4), nrow = 1, ncol = 4)
+layout(mat = layout.matrix,
+       heights = c(5, 5, 5, 5), 
+       widths = c(5, 5, 5, 1))
+par(mar = c(10.2,9.2,8.2,4.2),
+    mgp = c(5,1.5,0))
+image(resY, col = viridis::mako(4000), yaxt='n', xaxt='n', zlim = c(0,1),
+      ylab = "Selection Coefficient",
+      xlab = "",
+      main = "Frequency on Y",
+      cex.lab = 3.2,
+      cex.main = 3.6)
+axis(2, at = seq(from = 0, to = 1, length.out=6),
+     labels = seq(from = 0, to = 0.5, length.out=6),
+     cex.axis = 2.2)
+axis(1, at = seq(from = 0, to = 1, length.out=6),
+     labels = seq(from = 0, to = 5, length.out=6),
+     cex.axis = 2.2)
+image(resX, col = viridis::mako(4000), yaxt='n', xaxt='n', zlim = c(0,1),
+      ylab = "Selection Coefficient",
+      xlab = "Coding Sites Transitioning to Achiasmy (Mb)",
+      main = "Frequency on X",
+      cex.lab = 3.2,
+      cex.main = 3.6)
+axis(2, at = seq(from = 0, to = 1, length.out=6),
+     labels = seq(from = 0, to = 0.5, length.out=6),
+     cex.axis = 2.2)
+axis(1, at = seq(from = 0, to = 1, length.out=6),
+     labels = seq(from = 0, to = 5, length.out=6),
+     cex.axis = 2.2)
+image(resA, col = viridis::mako(4000), yaxt='n', xaxt='n', zlim = c(0,1),
+      ylab = "Selection Coefficient",
+      xlab = "",
+      main = "Frequency on Autosome",
+      cex.lab = 3.2,
+      cex.main = 3.6)
+axis(2, at = seq(from = 0, to = 1, length.out=6),
+     labels = seq(from = 0, to = 0.5, length.out=6),
+     cex.axis = 2.2)
+axis(1, at = seq(from = 0, to = 1, length.out=6),
+     labels = seq(from = 0, to = 5, length.out=6),
+     cex.axis = 2.2)
+
+# image.plot(resY, col = viridis::mako(4000), legend.only = T,
+#            horizontal = F, legend.width = 5, legend.mar = 0,
+#            legend.shrink = 0.8)
+#####
+#### h1-r03 plot ####
+resY <- as.matrix(read.csv("data/resY-h1-r03.csv"))
+resX <- as.matrix(read.csv("data/resX-h1-r03.csv"))
+resA <- as.matrix(read.csv("data/resA-h1-r03.csv"))
+
+layout.matrix <- matrix(c(1, 2, 3, 4), nrow = 1, ncol = 4)
+layout(mat = layout.matrix,
+       heights = c(5, 5, 5, 5), 
+       widths = c(5, 5, 5, 1))
+par(mar = c(10.2,9.2,8.2,4.2),
+    mgp = c(5,1.5,0))
+image(resY, col = viridis::mako(4000), yaxt='n', xaxt='n', zlim = c(0,1),
+      ylab = "Selection Coefficient",
+      xlab = "",
+      main = "Frequency on Y",
+      cex.lab = 3.2,
+      cex.main = 3.6)
+axis(2, at = seq(from = 0, to = 1, length.out=6),
+     labels = seq(from = 0, to = 0.5, length.out=6),
+     cex.axis = 2.2)
+axis(1, at = seq(from = 0, to = 1, length.out=6),
+     labels = seq(from = 0, to = 5, length.out=6),
+     cex.axis = 2.2)
+image(resX, col = viridis::mako(4000), yaxt='n', xaxt='n', zlim = c(0,1),
+      ylab = "Selection Coefficient",
+      xlab = "Coding Sites Transitioning to Achiasmy (Mb)",
+      main = "Frequency on X",
+      cex.lab = 3.2,
+      cex.main = 3.6)
+axis(2, at = seq(from = 0, to = 1, length.out=6),
+     labels = seq(from = 0, to = 0.5, length.out=6),
+     cex.axis = 2.2)
+axis(1, at = seq(from = 0, to = 1, length.out=6),
+     labels = seq(from = 0, to = 5, length.out=6),
+     cex.axis = 2.2)
+image(resA, col = viridis::mako(4000), yaxt='n', xaxt='n', zlim = c(0,1),
+      ylab = "Selection Coefficient",
+      xlab = "",
+      main = "Frequency on Autosome",
+      cex.lab = 3.2,
+      cex.main = 3.6)
+axis(2, at = seq(from = 0, to = 1, length.out=6),
+     labels = seq(from = 0, to = 0.5, length.out=6),
+     cex.axis = 2.2)
+axis(1, at = seq(from = 0, to = 1, length.out=6),
+     labels = seq(from = 0, to = 5, length.out=6),
+     cex.axis = 2.2)
+
+# image.plot(resY, col = viridis::mako(4000), legend.only = T,
+#            horizontal = F, legend.width = 5, legend.mar = 0,
+#            legend.shrink = 0.8)
+#####
+
+### ME vs Aneu ####
+steps <- 200
+acss <- seq(from = 0, to = 5e+06, length.out=steps)
+kvals <- seq(from = 0, to = 0.05, length.out=steps)
+gen <- 1000
+
+resY <- resX <- resA <- matrix(NA, steps, steps)
+row.names(resY) <- row.names(resX) <- row.names(resA) <- paste("acs.", round(acss, 3), sep="")
+colnames(resY) <- colnames(resX)<- colnames(resA) <- paste("kval.", round(kvals, 3), sep="")
+
+# Y mutation
+for (i in 1:steps) { # cycles through the mutational effects factors
+  print(paste("working on acs", i))
+  for (j in 1:steps) { # cycles through aneuploidy rates (k)
+    res <- simLife(r2 = 0.1, r1 = 0.1, h=1, s=0,
+                   aneu = kvals[j], acs = acss[i],
+                   gen = gen, option = "Y")
+    resY[i, j] <- (res[gen,6]+res[gen,8])
+  }
+}
+# X mutation
+for (i in 1:steps) { # cycles through the mutational effects factors
+  print(paste("working on acs", i))
+  for (j in 1:steps) { # cycles through aneuploidy rates (k)
+    res <- simLife(r2 = 0.1, r1 = 0.1, h=1, s=0,
+                   aneu = kvals[j], acs = acss[i],
+                   gen = gen, option = "X")
+    resX[i, j] <- (res[gen,2]+res[gen,4])
+  }
+}
+# A mutation
+for (i in 1:steps) { # cycles through the mutational effects factors
+  print(paste("working on acs", i))
+  for (j in 1:steps) { # cycles through aneuploidy rates (k)
+    res <- simLife(r2 = 0.1, r1 = 0.1, h=1, s=0,
+                   aneu = kvals[j], acs = acss[i],
+                   gen = gen, option = "A")
+    resA[i, j] <- (((res[gen,2]+res[gen,4])*1.5)+((res[gen,6]+res[gen,8])*0.5))/2
+  }
+}
+write.csv(resY, file = "data/resY-k.csv", row.names = F)
+write.csv(resX, file = "data/resX-k.csv", row.names = F)
+write.csv(resA, file = "data/resA-k.csv", row.names = F)
+
+# Plotting
+resY <- as.matrix(read.csv("data/resY-k.csv"))
+resX <- as.matrix(read.csv("data/resX-k.csv"))
+resA <- as.matrix(read.csv("data/resA-k.csv"))
+
+layout.matrix <- matrix(c(1, 2, 3, 4), nrow = 1, ncol = 4)
+layout(mat = layout.matrix,
+       heights = c(5, 5, 5, 5), 
+       widths = c(5, 5, 5, 1))
+par(mar = c(10.2,9.2,8.2,4.2),
+    mgp = c(5,1.5,0))
+image(resY, col = viridis::mako(4000), yaxt='n', xaxt='n', zlim = c(0,1),
+      ylab = "Aneuploidy Rate",
+      xlab = "",
+      main = "Frequency on Y",
+      cex.lab = 3.2,
+      cex.main = 3.6)
+axis(2, at = seq(from = 0, to = 1, length.out=6),
+     labels = seq(from = 0, to = 0.05, length.out=6),
+     cex.axis = 2.2)
+axis(1, at = seq(from = 0, to = 1, length.out=6),
+     labels = seq(from = 0, to = 5, length.out=6),
+     cex.axis = 2.2)
+image(resX, col = viridis::mako(4000), yaxt='n', xaxt='n', zlim = c(0,1),
+      ylab = "Aneuploidy Rate",
+      xlab = "Coding Sites Transitioning to Achiasmy (Mb)",
+      main = "Frequency on X",
+      cex.lab = 3.2,
+      cex.main = 3.6)
+axis(2, at = seq(from = 0, to = 1, length.out=6),
+     labels = seq(from = 0, to = 0.05, length.out=6),
+     cex.axis = 2.2)
+axis(1, at = seq(from = 0, to = 1, length.out=6),
+     labels = seq(from = 0, to = 5, length.out=6),
+     cex.axis = 2.2)
+image(resA, col = viridis::mako(4000), yaxt='n', xaxt='n', zlim = c(0,1),
+      ylab = "Aneuploidy Rate",
+      xlab = "",
+      main = "Frequency on Autosome",
+      cex.lab = 3.2,
+      cex.main = 3.6)
+axis(2, at = seq(from = 0, to = 1, length.out=6),
+     labels = seq(from = 0, to = 0.05, length.out=6),
+     cex.axis = 2.2)
+axis(1, at = seq(from = 0, to = 1, length.out=6),
+     labels = seq(from = 0, to = 5, length.out=6),
+     cex.axis = 2.2)
+
+# par(mfrow=c(1,1))
+# image.plot(resY, col = viridis(100, begin = 0.25), legend.only = T,
+#            horizontal = T, legend.width = 1, legend.mar = 5,
+#            legend.shrink = 0.8)
 #####
 
 ### Comparing across different recombination frequencies ####
@@ -520,4 +796,3 @@ axis(1, at = seq(from = 0, to = 1, length.out=6),
 ### TODO Plot Autosome
 
 #####
-
