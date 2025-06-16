@@ -20,7 +20,7 @@ library(ggplot2)
 
 # Step 1: Connect to Ensembl BioMart
 ## Human
-ensembl <- useMart("ensembl", dataset = "hsapiens_gene_ensembl")
+#ensembl <- useMart("ensembl", dataset = "hsapiens_gene_ensembl")
 ## Fruit Fly
 ensembl <- useMart("ensembl", dataset = "dmelanogaster_gene_ensembl")
 
@@ -88,7 +88,6 @@ perform_fishers_test <- function(go_id, chromosome, go_counts, total_genes) {
   b <- max(0, b)
   c <- max(0, c)
   d <- max(0, d)
-  
   if (!is.finite(a) || !is.finite(b) || !is.finite(c) || !is.finite(d)) {
     return(NA)
   }
